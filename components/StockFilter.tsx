@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 const REGION_FILTERS = ['전체', '국내', '해외'] as const;
 const METRIC_FILTERS = [
   '스탁두두거래대금',
@@ -36,12 +38,12 @@ export default function StockFilter({
             key={filter}
             type="button"
             onClick={() => onRegionChange(filter)}
-            className={[
+            className={cn(
               'rounded-full px-3 py-1 text-xs transition-all hover:scale-105 cursor-pointer',
               region === filter
                 ? 'bg-secondary text-secondary-foreground'
-                : 'bg-transparent text-muted-foreground hover:bg-muted/40',
-            ].join(' ')}
+                : 'bg-transparent text-muted-foreground hover:bg-muted/40'
+            )}
           >
             {filter}
           </button>
@@ -51,12 +53,12 @@ export default function StockFilter({
             key={filter}
             type="button"
             onClick={() => onMetricChange(filter)}
-            className={[
+            className={cn(
               'rounded-full px-3 py-1 text-xs transition-all hover:scale-105 border border-transparent cursor-pointer',
               metric === filter
                 ? 'bg-muted text-foreground border-border'
-                : 'bg-transparent text-muted-foreground hover:bg-muted/40',
-            ].join(' ')}
+                : 'bg-transparent text-muted-foreground hover:bg-muted/40'
+            )}
           >
             {filter}
           </button>

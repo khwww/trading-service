@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -55,12 +56,12 @@ export default function StockTable({
                       onClick={(e) => onToggleFavorite(stock.id, e)}
                     >
                       <Heart
-                        className={[
+                        className={cn(
                           'h-4 w-4 transition-all',
                           favorites.includes(stock.id)
                             ? 'scale-110 fill-red-500 text-red-500'
-                            : 'text-slate-500 group-hover:text-slate-300',
-                        ].join(' ')}
+                            : 'text-slate-500 group-hover:text-slate-300'
+                        )}
                       />
                     </button>
                     <span className="w-4 font-mono text-xs font-medium text-muted-foreground">
@@ -77,12 +78,12 @@ export default function StockTable({
                 </td>
                 <td className="p-3">
                   <span
-                    className={[
+                    className={cn(
                       'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium tabular-nums',
                       stock.isPositive
                         ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
-                        : 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20',
-                    ].join(' ')}
+                        : 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20'
+                    )}
                   >
                     {stock.change}
                   </span>
