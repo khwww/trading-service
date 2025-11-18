@@ -1,6 +1,6 @@
 'use client';
 
-import { mockOrderBook } from '../data/mockData';
+import { mockOrderBook } from '@/data/mockData';
 
 export default function OrderBook() {
   return (

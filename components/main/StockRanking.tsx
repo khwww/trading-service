@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import StockFilter from './StockFilter';
-import StockTable from './StockTable';
+import StockFilter from '@/components/common/StockFilter';
+import StockTable from '@/components/common/StockTable';
 
 const STOCK_DATA = [
   {

@@ -1,9 +1,9 @@
 'use client';
 
-import StockHeader from '@/components/StockHeader';
-import StockChart from '@/components/StockChart';
-import OrderBook from '@/components/OrderBook';
-import TradingPanel from '@/components/TradingPanel';
+import StockHeader from '@/components/detail/StockHeader';
+import StockChart from '@/components/detail/StockChart';
+import OrderBook from '@/components/detail/OrderBook';
+import TradingPanel from '@/components/detail/TradingPanel';
 
 export default function StockDetailPage() {
   return (

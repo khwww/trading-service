@@ -1,5 +1,5 @@
-import MarketOverview from '@/components/MarketOverview';
-import StockRanking from '@/components/StockRanking';
+import MarketOverview from '@/components/main/MarketOverview';
+import StockRanking from '@/components/main/StockRanking';
 
 export default function Home() {
   return (

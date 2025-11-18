@@ -1,4 +1,4 @@
-import { stockInfo } from '../data/mockData';
+import { stockInfo } from '@/data/mockData';
 
 export default function StockHeader() {
   const { name, code, currentPrice, change, changeRate, changeType, previousClose, marketCap } = stockInfo;

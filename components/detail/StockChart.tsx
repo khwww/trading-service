@@ -1,7 +1,7 @@
 'use client';
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { mockChartData } from '../data/mockData';
+import { mockChartData } from '@/data/mockData';
 import { TrendingUp, TrendingDown, Maximize2, Share2 } from 'lucide-react';
 
 export default function StockChart() {
