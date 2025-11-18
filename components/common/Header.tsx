@@ -1,15 +1,17 @@
+import Link from 'next/link';
+
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur">
       <div className="flex items-center justify-between px-6 py-3">
-        <div className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3 cursor-pointer">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
             <span className="font-bold text-primary-foreground text-sm">
               SD
             </span>
           </div>
           <span className="text-lg font-bold">스탁두두</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-3">
           <button
             type="button"
