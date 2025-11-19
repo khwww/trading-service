@@ -82,7 +82,7 @@ export default function TradingPanel() {
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
-                  className="flex-1 bg-transparent outline-none text-white"
+                  className="bg-transparent outline-none text-white font-medium w-20"
                   placeholder="0"
                 />
                 <div className="flex items-center gap-1">
