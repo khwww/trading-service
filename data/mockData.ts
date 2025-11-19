@@ -1,7 +1,6 @@
 // 호가 데이터 타입
 export interface OrderBookItem {
   date: string;
-  rank: number;
   changeRate: string;
   volume: number;
 }
@@ -14,22 +13,22 @@ export interface ChartDataPoint {
 
 // 호가창 목업 데이터
 export const mockOrderBook: OrderBookItem[] = [
-  { date: "103.774원", rank: 16, changeRate: "+3.22%", volume: 47536005 },
-  { date: "103.778원", rank: 15, changeRate: "+3.19%", volume: 47536037 },
-  { date: "103.744원", rank: 9, changeRate: "+3.13%", volume: 47536005 },
-  { date: "103.745원", rank: 17, changeRate: "+3.13%", volume: 47536070 },
-  { date: "103.836원", rank: 9, changeRate: "+3.17%", volume: 47536155 },
-  { date: "103.838원", rank: 10, changeRate: "+3.20%", volume: 47536048 },
-  { date: "103.802원", rank: 7, changeRate: "+3.22%", volume: 47536007 },
-  { date: "103.807원", rank: 9, changeRate: "+3.32%", volume: 47536100 },
-  { date: "103.828원", rank: 19, changeRate: "+3.30%", volume: 47536026 },
-  { date: "103.811원", rank: 10, changeRate: "+3.33%", volume: 47536052 },
-  { date: "103.735원", rank: 17, changeRate: "+3.18%", volume: 47536140 },
-  { date: "103.700원", rank: 13, changeRate: "+3.20%", volume: 47536199 },
-  { date: "103.829원", rank: 18, changeRate: "+3.25%", volume: 47536027 },
-  { date: "103.722원", rank: 10, changeRate: "+3.20%", volume: 47536106 },
-  { date: "103.761원", rank: 9, changeRate: "+3.40%", volume: 47536165 },
-  { date: "103.766원", rank: 13, changeRate: "+3.22%", volume: 47536160 },
+  { date: "103.774원", changeRate: "+3.22%", volume: 47536005 },
+  { date: "103.778원", changeRate: "+3.19%", volume: 47536037 },
+  { date: "103.744원", changeRate: "+3.13%", volume: 47536005 },
+  { date: "103.745원", changeRate: "+3.13%", volume: 47536070 },
+  { date: "103.836원", changeRate: "+3.17%", volume: 47536155 },
+  { date: "103.838원", changeRate: "+3.20%", volume: 47536048 },
+  { date: "103.802원", changeRate: "+3.22%", volume: 47536007 },
+  { date: "103.807원", changeRate: "+3.32%", volume: 47536100 },
+  { date: "103.828원", changeRate: "+3.30%", volume: 47536026 },
+  { date: "103.811원", changeRate: "+3.33%", volume: 47536052 },
+  { date: "103.735원", changeRate: "+3.18%", volume: 47536140 },
+  { date: "103.700원", changeRate: "+3.20%", volume: 47536199 },
+  { date: "103.829원", changeRate: "+3.25%", volume: 47536027 },
+  { date: "103.722원", changeRate: "+3.20%", volume: 47536106 },
+  { date: "103.761원", changeRate: "+3.40%", volume: 47536165 },
+  { date: "103.766원", changeRate: "+3.22%", volume: 47536160 },
 ];
 
 // 차트 목업 데이터

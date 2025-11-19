@@ -13,7 +13,7 @@ export default function StockDetailPage() {
 
       {/* 탭 메뉴 */}
       <div className="bg-black border-b border-gray-800">
-        <div className="flex items-center gap-6 px-4">
+        <div className="flex items-center gap-6 px-4 detail-content-padding">
           <button className="py-3 border-b-2 border-white text-white font-medium">
             차트 · 호가
           </button>
@@ -33,7 +33,7 @@ export default function StockDetailPage() {
       </div>
 
       {/* 메인 컨텐츠 */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 detail-content-padding">
         {/* 차트 영역 */}
         <div className="lg:col-span-6 border-r border-gray-800">
           <StockChart />

@@ -15,7 +15,6 @@ export default function OrderBook() {
           <thead className="sticky top-0 bg-black border-b border-gray-800">
             <tr className="text-gray-400">
               <th className="text-left py-2 font-normal">체결가</th>
-              <th className="text-right py-2 font-normal">체결강도</th>
               <th className="text-right py-2 font-normal">등락률</th>
               <th className="text-right py-2 font-normal pr-2">거래대금</th>
             </tr>
@@ -26,7 +25,6 @@ export default function OrderBook() {
               return (
                 <tr key={index} className="border-b border-gray-900 hover:bg-gray-900">
                   <td className="py-2">{item.date}</td>
-                  <td className="text-right">{item.rank}</td>
                   <td className={`text-right ${isNegative ? 'text-red-500' : 'text-blue-500'}`}>
                     {item.changeRate}
                   </td>
