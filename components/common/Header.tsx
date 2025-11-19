@@ -1,6 +1,19 @@
+import { verifyJwt } from '@/lib/jwt';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import HeaderAuthSection from './HeaderAuthSection';
 
-export default function Header() {
+export default async function Header() {
+  const token = (await cookies()).get('auth')?.value;
+
+  let nickname: string | null = null;
+
+  if (token) {
+    const payload = await verifyJwt(token);
+    if (payload) {
+      nickname = payload.nickname;
+    }
+  }
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur">
       <div className="flex items-center justify-between px-6 py-3">
@@ -12,14 +25,7 @@ export default function Header() {
           </div>
           <span className="text-lg font-bold">스탁두두</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-full bg-[#FEE500] px-3 py-1.5 text-xs font-semibold text-black active:scale-95 transition"
-          >
-            <span>카카오로 시작하기</span>
-          </button>
-        </div>
+        <HeaderAuthSection nickname={nickname} />
       </div>
     </header>
   );
