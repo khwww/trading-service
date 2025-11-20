@@ -4,12 +4,12 @@ import { mockOrderBook } from '@/data/mockData';
 
 export default function OrderBook() {
   return (
-    <div className="bg-black text-white p-4 h-full">
+    <div className="bg-black text-white p-4">
       <h2 className="text-lg font-semibold mb-4">시세</h2>
 
       <div
         className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600 pr-2"
-        style={{ maxHeight: 'calc(100vh - 200px)' }}
+        style={{ height: '500px' }}
       >
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-black border-b border-gray-800">

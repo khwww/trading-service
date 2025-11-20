@@ -12,7 +12,7 @@ export default function StockChart() {
   }));
 
   return (
-    <div className="bg-black text-white p-4">
+    <div className="bg-black text-white">
       {/* 차트 컨트롤 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export default function StockChart() {
       </div>
 
       {/* 차트 */}
-      <div className="relative" style={{ height: '400px' }}>
+      <div className="relative" style={{ height: '500px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={mockChartData}>
             <defs>
@@ -79,25 +79,6 @@ export default function StockChart() {
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* 차트 하단 버튼 */}
-      <div className="flex items-center gap-2 mt-4">
-        <button className="px-3 py-1 text-sm border border-gray-700 rounded hover:bg-gray-800">
-          1분
-        </button>
-        <button className="px-3 py-1 text-sm border border-gray-700 rounded hover:bg-gray-800">
-          일
-        </button>
-        <button className="px-3 py-1 text-sm border border-gray-700 rounded hover:bg-gray-800">
-          주
-        </button>
-        <button className="px-3 py-1 text-sm border border-gray-700 rounded hover:bg-gray-800">
-          월
-        </button>
-        <button className="px-3 py-1 text-sm border border-gray-700 rounded hover:bg-gray-800">
-          년
-        </button>
       </div>
     </div>
   );
