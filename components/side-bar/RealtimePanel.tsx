@@ -128,7 +128,7 @@ export default function RealtimePanel() {
       </div>
 
       {/* 실시간 종목 리스트 */}
-      <div className="divide-y divide-gray-800">
+      <div>
         {REALTIME_STOCKS.map((stock) => (
           <div
             key={stock.rank}

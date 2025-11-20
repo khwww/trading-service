@@ -1,7 +1,7 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 :root {
-  --background: oklch(0.08 0.005 264);
+  --background: oklch(0.065 0.003 264);
   --foreground: oklch(0.92 0.005 264);
   --card: oklch(0.11 0.008 264);
   --card-foreground: oklch(0.92 0.005 264);
@@ -34,6 +34,7 @@
   --sidebar-accent-foreground: oklch(0.92 0.005 264);
   --sidebar-border: oklch(0.18 0.01 264);
   --sidebar-ring: oklch(0.45 0.15 264);
+  --detail-section: oklch(23.116% 0.00193 286.052);
 }
 
 @theme inline {
@@ -79,7 +80,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    /* --background: #ef2828; */
     --foreground: #ededed;
   }
 }

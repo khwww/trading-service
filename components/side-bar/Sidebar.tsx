@@ -3,17 +3,15 @@
 import {
   ChevronsLeft,
   ChevronsRight,
-  Home,
   Heart,
   Clock,
   Flame,
 } from "lucide-react";
-import MyInvestmentPanel from "./MyInvestmentPanel";
 import FavoritesPanel from "./FavoritesPanel";
 import RecentPanel from "./RecentPanel";
 import RealtimePanel from "./RealtimePanel";
 
-type PanelType = "my-investment" | "favorites" | "recent" | "realtime" | null;
+type PanelType = "favorites" | "recent" | "realtime" | null;
 
 interface SidebarProps {
   activePanel: PanelType;
@@ -22,7 +20,6 @@ interface SidebarProps {
 
 export default function Sidebar({ activePanel, setActivePanel }: SidebarProps) {
   const menuItems = [
-    { icon: Home, label: "내 투자", type: "my-investment" as PanelType },
     { icon: Heart, label: "관심", type: "favorites" as PanelType },
     { icon: Clock, label: "최근 본", type: "recent" as PanelType },
     { icon: Flame, label: "실시간", type: "realtime" as PanelType },
@@ -34,8 +31,6 @@ export default function Sidebar({ activePanel, setActivePanel }: SidebarProps) {
 
   const renderPanel = () => {
     switch (activePanel) {
-      case "my-investment":
-        return <MyInvestmentPanel />;
       case "favorites":
         return <FavoritesPanel />;
       case "recent":
@@ -71,7 +66,7 @@ export default function Sidebar({ activePanel, setActivePanel }: SidebarProps) {
       <aside className="fixed right-0 top-0 h-screen bg-zinc-900 border-l border-gray-800 z-60 w-16">
         {/* 접기/펼치기 버튼 */}
         <button
-          onClick={() => setActivePanel(activePanel ? null : "my-investment")}
+          onClick={() => setActivePanel(activePanel ? null : "favorites")}
           className="w-full py-4 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
         >
           {activePanel ? (

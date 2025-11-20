@@ -4,7 +4,7 @@ export default function StockHeader() {
   const { name, code, currentPrice, change, changeRate, changeType, previousClose, marketCap } = stockInfo;
 
   return (
-    <div className="bg-black text-white p-4">
+    <div className="bg-black text-white py-4">
       <div className="flex items-center gap-2 mb-4">
         <h1 className="text-lg font-semibold">{name}</h1>
         <span className="text-sm text-gray-400">{code}</span>

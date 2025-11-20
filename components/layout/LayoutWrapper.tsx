@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Sidebar from '@/components/side-bar/Sidebar';
 
-type PanelType = 'my-investment' | 'favorites' | 'recent' | 'realtime' | null;
+type PanelType = 'favorites' | 'recent' | 'realtime' | null;
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const [activePanel, setActivePanel] = useState<PanelType>(null);
@@ -16,7 +16,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           transition: padding-right 0.3s;
         }
         .detail-content-padding {
-          padding-right: ${activePanel ? '28rem' : '4rem'} !important;
+          padding-right: ${activePanel ? 'calc(28rem + 24px)' : 'calc(4rem + 24px)'} !important;
+          transition: padding-right 0.3s;
+        }
+        .main-content-padding {
+          padding-right: ${activePanel ? '28rem' : '6rem'} !important;
           transition: padding-right 0.3s;
         }
       `}</style>

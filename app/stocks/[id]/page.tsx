@@ -3,50 +3,26 @@
 import StockHeader from '@/components/detail/StockHeader';
 import StockChart from '@/components/detail/StockChart';
 import OrderBook from '@/components/detail/OrderBook';
-import TradingPanel from '@/components/detail/TradingPanel';
 
 export default function StockDetailPage() {
   return (
-    <div className="min-h-screen bg-black">
-      {/* 헤더 */}
-      <StockHeader />
+    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
+      {/* 전체 컨텐츠 영역 */}
+      <div className="px-6 detail-content-padding">
+        {/* 헤더 */}
+        <StockHeader />
 
-      {/* 탭 메뉴 */}
-      <div className="bg-black border-b border-gray-800">
-        <div className="flex items-center gap-6 px-4 detail-content-padding">
-          <button className="py-3 border-b-2 border-white text-white font-medium">
-            차트 · 호가
-          </button>
-          <button className="py-3 text-gray-400 hover:text-white">
-            종목정보
-          </button>
-          <button className="py-3 text-gray-400 hover:text-white">
-            뉴스 · 공시
-          </button>
-          <button className="py-3 text-gray-400 hover:text-white">
-            거래현황
-          </button>
-          <button className="py-3 text-gray-400 hover:text-white">
-            커뮤니티
-          </button>
-        </div>
-      </div>
+        {/* 메인 컨텐츠 */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          {/* 차트 영역 */}
+          <div className="lg:col-span-8 rounded-lg overflow-hidden">
+            <StockChart />
+          </div>
 
-      {/* 메인 컨텐츠 */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 detail-content-padding">
-        {/* 차트 영역 */}
-        <div className="lg:col-span-6 border-r border-gray-800">
-          <StockChart />
-        </div>
-
-        {/* 호가창 영역 */}
-        <div className="lg:col-span-3 border-r border-gray-800">
-          <OrderBook />
-        </div>
-
-        {/* 주문하기 패널 */}
-        <div className="lg:col-span-3">
-          <TradingPanel />
+          {/* 호가창 영역 */}
+          <div className="lg:col-span-4 rounded-lg overflow-hidden">
+            <OrderBook />
+          </div>
         </div>
       </div>
     </div>
