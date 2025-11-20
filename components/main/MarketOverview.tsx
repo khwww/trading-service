@@ -40,14 +40,14 @@ export default function MarketOverview() {
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="mb-1 text-xs text-muted-foreground">
+                <div className="mb-1 text-sm text-muted-foreground">
                   {market.name}
                 </div>
                 <div className="mb-0.5 text-xl font-semibold tabular-nums">
                   {market.value}
                 </div>
                 <div
-                  className={`flex items-center gap-1 text-xs font-medium ${
+                  className={`flex items-center gap-1 text-sm font-medium ${
                     market.isPositive ? 'text-red-500' : 'text-blue-500'
                   }`}
                 >

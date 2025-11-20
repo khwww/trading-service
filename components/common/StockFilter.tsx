@@ -39,7 +39,7 @@ export default function StockFilter({
             type="button"
             onClick={() => onRegionChange(filter)}
             className={cn(
-              'rounded-full px-3 py-1 text-xs transition-all hover:scale-105 cursor-pointer',
+              'rounded-full px-3 py-1 text-sm transition-all hover:scale-105 cursor-pointer',
               region === filter
                 ? 'bg-secondary text-secondary-foreground'
                 : 'bg-transparent text-muted-foreground hover:bg-muted/40'
@@ -54,7 +54,7 @@ export default function StockFilter({
             type="button"
             onClick={() => onMetricChange(filter)}
             className={cn(
-              'rounded-full px-3 py-1 text-xs transition-all hover:scale-105 border border-transparent cursor-pointer',
+              'rounded-full px-3 py-1 text-sm transition-all hover:scale-105 border border-transparent cursor-pointer',
               metric === filter
                 ? 'bg-muted text-foreground border-border'
                 : 'bg-transparent text-muted-foreground hover:bg-muted/40'
@@ -63,12 +63,6 @@ export default function StockFilter({
             {filter}
           </button>
         ))}
-        <div className="ml-auto flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground cursor-pointer">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-            투자위험 주식 숨기기
-          </span>
-        </div>
       </div>
     </>
   );

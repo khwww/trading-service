@@ -134,14 +134,6 @@ export default function StockRanking() {
         favorites={favorites}
         onToggleFavorite={toggleFavorite}
       />
-      <div className="mt-4 text-center">
-        <button
-          type="button"
-          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          보유 종목이 없어요
-        </button>
-      </div>
     </div>
   );
 }
