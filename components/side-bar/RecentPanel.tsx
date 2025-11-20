@@ -25,7 +25,7 @@ export default function RecentPanel() {
       <div className="p-3">
         <div className="space-y-1.5">
           {RECENT_STOCKS.map((stock, index) => (
-            <div key={index} className="flex items-center gap-2 py-2 border-b border-gray-800 last:border-0 hover:bg-zinc-800 cursor-pointer rounded px-2">
+            <div key={index} className="flex items-center gap-2 py-2 hover:bg-zinc-800 cursor-pointer rounded px-2">
               <span className="text-xl">{stock.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium">{stock.name}</div>
