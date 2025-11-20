@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { User } from 'lucide-react';
 import Link from 'next/link';
+import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 
 type HeaderAuthSectionProps = {
   nickname: string | null;
@@ -12,6 +13,7 @@ export default function HeaderAuthSection({
   nickname,
 }: HeaderAuthSectionProps) {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -24,6 +26,12 @@ export default function HeaderAuthSection({
       console.error('로그아웃 실패', e);
     }
   };
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  useOnClickOutside(menuRef, handleClose);
 
   if (!nickname) {
     return (
@@ -39,7 +47,7 @@ export default function HeaderAuthSection({
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium">{nickname} 님</span>
         <button
