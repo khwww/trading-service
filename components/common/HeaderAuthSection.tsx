@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { User } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
+import { User, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 
 type HeaderAuthSectionProps = {
   nickname: string | null;
@@ -12,6 +13,7 @@ export default function HeaderAuthSection({
   nickname,
 }: HeaderAuthSectionProps) {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -24,6 +26,12 @@ export default function HeaderAuthSection({
       console.error('로그아웃 실패', e);
     }
   };
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  useOnClickOutside(menuRef, handleClose);
 
   if (!nickname) {
     return (
@@ -39,7 +47,7 @@ export default function HeaderAuthSection({
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium">{nickname} 님</span>
         <button
@@ -52,13 +60,14 @@ export default function HeaderAuthSection({
       </div>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-40 rounded-md border border-border bg-primary/70 shadow-lg py-2 z-50">
+        <div className="absolute right-0 mt-2 w-40 rounded-md border border-border bg-primary/70 shadow-lg py-2 z-50 px-2">
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full px-4 py-2 text-left text-sm cursor-pointer hover:font-semibold"
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm cursor-pointer hover:bg-primary hover:bg-opacity-80 transition-colors rounded-lg"
           >
-            로그아웃
+            <LogOut className="h-4 w-4 text-white" />
+            <span>로그아웃</span>
           </button>
         </div>
       )}
