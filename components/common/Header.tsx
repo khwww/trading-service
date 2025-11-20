@@ -23,7 +23,7 @@ export default async function Header() {
               SD
             </span>
           </div>
-          <span className="text-lg font-bold">스탁두두</span>
+          <span className="text-lg font-extrabold">스탁두두</span>
         </Link>
         <HeaderAuthSection nickname={nickname} />
       </div>

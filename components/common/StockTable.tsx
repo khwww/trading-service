@@ -33,7 +33,7 @@ export default function StockTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border bg-muted/30 text-left text-xs text-muted-foreground">
+            <tr className="border-b border-border bg-muted/30 text-left text-sm text-muted-foreground">
               <th className="p-3 font-medium">순위·오늘 22:06 기준</th>
               <th className="p-3 font-medium">현재가</th>
               <th className="p-3 font-medium">등락률</th>
@@ -64,22 +64,20 @@ export default function StockTable({
                         )}
                       />
                     </button>
-                    <span className="w-4 font-mono text-xs font-medium text-muted-foreground">
+                    <span className="w-4 text-sm font-medium text-muted-foreground">
                       {index + 1}
                     </span>
-                    <span className="text-xs">{stock.icon}</span>
-                    <span className="text-xs">{stock.name}</span>
+                    <span className="text-sm">{stock.icon}</span>
+                    <span className="text-sm">{stock.name}</span>
                   </div>
                 </td>
                 <td className="p-3">
-                  <span className="font-mono text-xs tabular-nums">
-                    {stock.price}
-                  </span>
+                  <span className="text-sm tabular-nums">{stock.price}</span>
                 </td>
                 <td className="p-3">
                   <span
                     className={cn(
-                      'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium tabular-nums',
+                      'inline-flex items-center rounded-full px-2 py-1 text-sm font-medium tabular-nums',
                       stock.isPositive
                         ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
                         : 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20'
@@ -89,13 +87,13 @@ export default function StockTable({
                   </span>
                 </td>
                 <td className="p-3">
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     {stock.volume}
                   </span>
                 </td>
                 <td className="p-3">
                   <div className="flex items-center justify-end gap-3">
-                    <div className="flex items-center gap-1 text-xs tabular-nums">
+                    <div className="flex items-center gap-1 text-sm tabular-nums">
                       <span className="text-blue-500">{stock.buyRatio}</span>
                       <span className="text-red-500">{stock.sellRatio}</span>
                     </div>
