@@ -16,7 +16,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           transition: padding-right 0.3s;
         }
         .detail-content-padding {
-          padding-right: ${activePanel ? '28rem' : '4rem'} !important;
+          padding-right: ${activePanel ? 'calc(28rem + 24px)' : 'calc(4rem + 24px)'} !important;
           transition: padding-right 0.3s;
         }
         .main-content-padding {

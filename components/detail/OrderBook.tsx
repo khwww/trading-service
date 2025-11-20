@@ -4,15 +4,15 @@ import { mockOrderBook } from '@/data/mockData';
 
 export default function OrderBook() {
   return (
-    <div className="bg-black text-white p-4">
-      <h2 className="text-lg font-semibold mb-4">시세</h2>
+    <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+      <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
 
       <div
         className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600 pr-2"
-        style={{ height: '500px' }}
+        style={{ height: '438px' }}
       >
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-black border-b border-gray-800">
+          <thead className="sticky top-0 border-b border-gray-800" style={{ background: 'var(--detail-section)' }}>
             <tr className="text-gray-400">
               <th className="text-left py-2 font-normal">체결가</th>
               <th className="text-right py-2 font-normal">등락률</th>
