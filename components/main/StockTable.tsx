@@ -56,7 +56,7 @@ export default function StockTable({
                 <tr
                   key={stock.code}
                   className="group border-b border-border/50 transition-all duration-200 hover:bg-muted cursor-pointer"
-                  onClick={() => router.push(`/stocks/${stock.code}`)}
+                  onClick={() => router.push(`/stocks/${stock.code}?name=${encodeURIComponent(stock.name)}`)}
                 >
                   <td className="p-3">
                     <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 'use client';
 
 import { use } from 'react';
+import { useSearchParams } from 'next/navigation';
 import StockHeader from '@/components/detail/StockHeader';
 import StockChart from '@/components/detail/StockChart';
 import OrderBook from '@/components/detail/OrderBook';
@@ -11,13 +12,15 @@ type PageProps = {
 
 export default function StockDetailPage({ params }: PageProps) {
   const { id: stockCode } = use(params);
+  const searchParams = useSearchParams();
+  const stockName = searchParams.get('name') || '';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       {/* 전체 컨텐츠 영역 */}
       <div className="px-6 detail-content-padding">
         {/* 헤더 */}
-        <StockHeader stockCode={stockCode} />
+        <StockHeader stockCode={stockCode} stockName={stockName} />
 
         {/* 메인 컨텐츠 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
