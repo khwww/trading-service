@@ -1,14 +1,7 @@
 import { cn } from '@/lib/utils';
 
 const REGION_FILTERS = ['전체', '국내', '해외'] as const;
-const METRIC_FILTERS = [
-  '스탁두두거래대금',
-  '스탁두두 거래량',
-  '거래대금',
-  '거래량',
-  '급상승',
-  '급하락',
-] as const;
+const METRIC_FILTERS = ['거래대금', '거래량', '급상승', '급하락'] as const;
 
 type StockFilterProps = {
   region: string;
