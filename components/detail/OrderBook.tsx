@@ -2,7 +2,13 @@
 
 import { mockOrderBook } from '@/data/mockData';
 
-export default function OrderBook() {
+type OrderBookProps = {
+  stockCode: string;
+};
+
+export default function OrderBook({ stockCode }: OrderBookProps) {
+  // TODO: stockCode로 실제 API 호출 예정
+  console.log('OrderBook stockCode:', stockCode);
   return (
     <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
       <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>

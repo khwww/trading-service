@@ -1,6 +1,12 @@
 import { stockInfo } from '@/data/mockData';
 
-export default function StockHeader() {
+type StockHeaderProps = {
+  stockCode: string;
+};
+
+export default function StockHeader({ stockCode }: StockHeaderProps) {
+  // TODO: stockCode로 실제 API 호출 예정
+  console.log('StockHeader stockCode:', stockCode);
   const { name, code, currentPrice, change, changeRate, changeType, previousClose, marketCap } = stockInfo;
 
   return (

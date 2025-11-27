@@ -16,7 +16,13 @@ function subscribe() {
   return () => {};
 }
 
-export default function StockChart() {
+type StockChartProps = {
+  stockCode: string;
+};
+
+export default function StockChart({ stockCode }: StockChartProps) {
+  // TODO: stockCode로 실제 API 호출 예정
+  console.log('StockChart stockCode:', stockCode);
   const isMounted = useSyncExternalStore(
     subscribe,
     () => true,
