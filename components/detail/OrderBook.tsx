@@ -1,14 +1,53 @@
 'use client';
 
-import { mockOrderBook } from '@/data/mockData';
+import { useStockDaily } from '@/hooks/useStockDaily';
 
 type OrderBookProps = {
   stockCode: string;
 };
 
+// 날짜 포맷 (YYYYMMDD -> MM.DD)
+function formatDate(dateStr: string) {
+  if (dateStr.length !== 8) return dateStr;
+  const month = dateStr.slice(4, 6);
+  const day = dateStr.slice(6, 8);
+  return `${month}.${day}`;
+}
+
+// 거래량 포맷 (만 단위)
+function formatVolume(volume: number) {
+  if (volume >= 10000) {
+    const man = Math.floor(volume / 10000);
+    return `${man.toLocaleString()}만`;
+  }
+  return volume.toLocaleString();
+}
+
 export default function OrderBook({ stockCode }: OrderBookProps) {
-  // TODO: stockCode로 실제 API 호출 예정
-  console.log('OrderBook stockCode:', stockCode);
+  const { data, isLoading, error } = useStockDaily(stockCode);
+
+  if (isLoading) {
+    return (
+      <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+        <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
+        <div className="animate-pulse space-y-2">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="h-8 bg-gray-700 rounded"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+        <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
+        <div className="text-red-500">데이터를 불러오는데 실패했습니다.</div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
       <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
@@ -20,23 +59,27 @@ export default function OrderBook({ stockCode }: OrderBookProps) {
         <table className="w-full text-sm">
           <thead className="sticky top-0 border-b border-gray-800" style={{ background: 'var(--detail-section)' }}>
             <tr className="text-gray-400">
-              <th className="text-left py-2 font-normal">체결가</th>
+              <th className="text-left py-2 font-normal">날짜</th>
+              <th className="text-right py-2 font-normal">종가</th>
               <th className="text-right py-2 font-normal">등락률</th>
-              <th className="text-right py-2 font-normal pr-2">거래대금</th>
+              <th className="text-right py-2 font-normal pr-2">거래량</th>
             </tr>
           </thead>
           <tbody>
-            {mockOrderBook.map((item, index) => {
-              const isNegative = item.changeRate.startsWith('+');
+            {data.map((item) => {
+              // changeSign: 1(상한), 2(상승), 3(보합), 4(하한), 5(하락)
+              const isUp = item.changeSign === '1' || item.changeSign === '2';
+              const isDown = item.changeSign === '4' || item.changeSign === '5';
+
               return (
-                <tr key={index} className="border-b border-gray-900 hover:bg-gray-900">
-                  <td className="py-2">{item.date}</td>
-                  <td className={`text-right ${isNegative ? 'text-red-500' : 'text-blue-500'}`}>
-                    {item.changeRate}
+                <tr key={item.date} className="border-b border-gray-900 hover:bg-gray-900">
+                  <td className="py-2 text-gray-400">{formatDate(item.date)}</td>
+                  <td className="text-right">{item.close.toLocaleString()}원</td>
+                  <td className={`text-right ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
+                    {isUp ? '+' : ''}{item.changeRate}%
                   </td>
                   <td className="text-right text-gray-400 pr-2">
-                    {item.volume.toLocaleString()}
-                    <div className="text-xs text-gray-600">4407</div>
+                    {formatVolume(item.volume)}
                   </td>
                 </tr>
               );

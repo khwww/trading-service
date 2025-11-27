@@ -70,3 +70,65 @@ export async function fetchStockPrice(code: string): Promise<StockPrice> {
     prevClose: Number(output.stck_sdpr),
   };
 }
+
+// 일별 시세 타입
+export type DailyPrice = {
+  date: string;           // 날짜 (YYYYMMDD)
+  close: number;          // 종가
+  open: number;           // 시가
+  high: number;           // 고가
+  low: number;            // 저가
+  volume: number;         // 거래량
+  amount: number;         // 거래대금
+  changeRate: number;     // 등락률
+  changeSign: string;     // 등락 부호
+};
+
+type DailyApiResponse = {
+  output: Array<{
+    stck_bsop_date: string;   // 영업일자
+    stck_clpr: string;        // 종가
+    stck_oprc: string;        // 시가
+    stck_hgpr: string;        // 고가
+    stck_lwpr: string;        // 저가
+    acml_vol: string;         // 누적 거래량
+    acml_tr_pbmn: string;     // 누적 거래대금
+    prdy_ctrt: string;        // 전일 대비율
+    prdy_vrss_sign: string;   // 전일 대비 부호
+  }>;
+  rt_cd: string;
+  msg_cd: string;
+  msg1: string;
+};
+
+export async function fetchStockDaily(code: string): Promise<DailyPrice[]> {
+  const res = await fetch(`/api/kis/stock/daily?code=${code}`, {
+    method: 'GET',
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`KIS stock daily error: ${text}`);
+  }
+
+  const data = (await res.json()) as DailyApiResponse;
+
+  // API 응답 확인용 로그
+  console.log('KIS Daily API 응답:', data);
+
+  if (data.rt_cd !== '0') {
+    throw new Error(`KIS API error: ${data.msg1}`);
+  }
+
+  return data.output.map((item) => ({
+    date: item.stck_bsop_date,
+    close: Number(item.stck_clpr),
+    open: Number(item.stck_oprc),
+    high: Number(item.stck_hgpr),
+    low: Number(item.stck_lwpr),
+    volume: Number(item.acml_vol),
+    amount: Number(item.acml_tr_pbmn),
+    changeRate: Number(item.prdy_ctrt),
+    changeSign: item.prdy_vrss_sign,
+  }));
+}
