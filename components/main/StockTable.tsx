@@ -20,7 +20,6 @@ export default function StockTable({
   metricType,
   onToggleFavorite,
 }: StockTableProps) {
-  console.log(metricType);
   const router = useRouter();
   return (
     <div className="overflow-hidden rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm">
@@ -97,7 +96,7 @@ export default function StockTable({
                             : 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20'
                       )}
                     >
-                      {stock.changeRate}%
+                      {stock.changeRate.toFixed(2)}%
                     </span>
                   </td>
                   <td className="p-3">

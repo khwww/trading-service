@@ -7,7 +7,7 @@ import {
   fetchDomesticRanking,
 } from '@/services/kisRankingClient';
 
-type RankingMetric = 'amount' | 'volume' | 'rising' | 'falling';
+type RankingMetric = 'amount' | 'volume' | 'rise' | 'fall';
 
 type RegionFilter = '전체' | '국내' | '해외';
 
@@ -28,8 +28,8 @@ function resolveRankingQuery(
   let rankingMetric: RankingMetric | null = null;
   if (metric.includes('거래대금')) rankingMetric = 'amount';
   else if (metric.includes('거래량')) rankingMetric = 'volume';
-  else if (metric.includes('급상승')) rankingMetric = 'rising';
-  else if (metric.includes('급하락')) rankingMetric = 'falling';
+  else if (metric.includes('급상승')) rankingMetric = 'rise';
+  else if (metric.includes('급하락')) rankingMetric = 'fall';
 
   if (!rankingMetric) {
     return {
@@ -49,13 +49,13 @@ function resolveRankingQuery(
     };
   }
 
-  // 국내 급상승 / 급하락
-  if (rankingMetric === 'rising' || rankingMetric === 'falling') {
+  if (rankingMetric === 'rise' || rankingMetric === 'fall') {
+    const apiMetric: DomesticRankingMetric =
+      rankingMetric === 'rise' ? 'rise' : 'fall';
     return {
-      queryKey: ['ranking', 'domestic', rankingMetric],
-      enabled: false,
-      queryFn: async () => [],
-      notImplementedMessage: '국내 급등/급락 순위는 아직 준비 중입니다.',
+      queryKey: ['ranking', 'domestic', apiMetric],
+      enabled: regionFilter === '국내' || regionFilter === '전체',
+      queryFn: () => fetchDomesticRanking(apiMetric),
     };
   }
 
