@@ -3,10 +3,11 @@ import { getServerAccessToken } from '@/services/kisServerAuth';
 
 const BASE_URL = 'https://openapi.koreainvestment.com:9443';
 
+type Metric = 'amount' | 'volume' | 'rise' | 'fall';
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    type Metric = 'amount' | 'volume' | 'rise' | 'fall';
     const metric = (searchParams.get('metric') ?? 'amount') as Metric;
 
     const appKey = process.env.KIS_APP_KEY;

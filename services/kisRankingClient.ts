@@ -62,3 +62,47 @@ export async function fetchDomesticRanking(
     prevVolume: Number(row.prdy_vol), // 전일 거래량
   }));
 }
+
+export type OverseasRankingMetric = DomesticRankingMetric;
+export type OverseasRankingItem = DomesticRankingItem;
+
+type KISOverseasRankingRow = {
+  symb: string; // 종목코드
+  name: string; // 종목명
+  last: string | number; // 현재가
+  rate: string | number; // 등락율
+  tvol: string | number; // 거래량
+  tamt?: string | number; // 거래대금 (없는 API도 있어서 optional)
+  n_tvol?: string | number; // 기준/평균 거래량 (증가율/회전율에서 optional)
+};
+
+type OverseasApiResponse = {
+  output2?: KISOverseasRankingRow[];
+};
+
+export async function fetchOverseasRanking(
+  metric: OverseasRankingMetric = 'volume'
+): Promise<OverseasRankingItem[]> {
+  const res = await fetch(`/api/kis/ranking/overseas?metric=${metric}`, {
+    method: 'GET',
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`KIS overseas ranking error: ${text}`);
+  }
+
+  const data = (await res.json()) as OverseasApiResponse;
+
+  const rows = data.output2 ?? [];
+
+  return rows.map((row) => ({
+    code: row.symb,
+    name: row.name,
+    price: Number(row.last),
+    changeRate: Number(row.rate),
+    volume: Number(row.tvol),
+    amount: Number(row.tamt ?? 0),
+    prevVolume: Number(row.n_tvol ?? 0),
+  }));
+}

@@ -4,81 +4,25 @@ import { useQuery } from '@tanstack/react-query';
 import {
   DomesticRankingItem,
   DomesticRankingMetric,
+  OverseasRankingMetric,
   fetchDomesticRanking,
+  fetchOverseasRanking,
 } from '@/services/kisRankingClient';
 
+type RegionFilter = '전체' | '국내' | '해외';
 type RankingMetric = 'amount' | 'volume' | 'rise' | 'fall';
 
-type RegionFilter = '전체' | '국내' | '해외';
+type StockRankingItem = DomesticRankingItem;
 
 type ResolvedRankingQuery = {
   queryKey: (string | RegionFilter | RankingMetric)[];
   enabled: boolean;
-  queryFn: () => Promise<DomesticRankingItem[]>;
+  queryFn: () => Promise<StockRankingItem[]>;
   notImplementedMessage?: string;
 };
 
-function resolveRankingQuery(
-  region: string,
-  metric: string
-): ResolvedRankingQuery {
-  const regionFilter: RegionFilter =
-    region === '국내' || region === '해외' ? (region as RegionFilter) : '전체';
-
-  let rankingMetric: RankingMetric | null = null;
-  if (metric.includes('거래대금')) rankingMetric = 'amount';
-  else if (metric.includes('거래량')) rankingMetric = 'volume';
-  else if (metric.includes('급상승')) rankingMetric = 'rise';
-  else if (metric.includes('급하락')) rankingMetric = 'fall';
-
-  if (!rankingMetric) {
-    return {
-      queryKey: ['ranking', regionFilter, 'unknown'],
-      enabled: false,
-      queryFn: async () => [],
-      notImplementedMessage: '선택한 지표는 아직 준비 중입니다.',
-    };
-  }
-
-  if (rankingMetric === 'amount' || rankingMetric === 'volume') {
-    const apiMetric: DomesticRankingMetric = rankingMetric;
-    return {
-      queryKey: ['ranking', 'domestic', apiMetric],
-      enabled: true,
-      queryFn: () => fetchDomesticRanking(apiMetric),
-    };
-  }
-
-  if (rankingMetric === 'rise' || rankingMetric === 'fall') {
-    const apiMetric: DomesticRankingMetric =
-      rankingMetric === 'rise' ? 'rise' : 'fall';
-    return {
-      queryKey: ['ranking', 'domestic', apiMetric],
-      enabled: regionFilter === '국내' || regionFilter === '전체',
-      queryFn: () => fetchDomesticRanking(apiMetric),
-    };
-  }
-
-  // 해외 미구현
-  if (regionFilter === '해외') {
-    return {
-      queryKey: ['ranking', 'overseas', rankingMetric],
-      enabled: false,
-      queryFn: async () => [],
-      notImplementedMessage: '해외 실시간 순위는 아직 준비 중입니다.',
-    };
-  }
-
-  return {
-    queryKey: ['ranking', regionFilter, 'unknown'],
-    enabled: false,
-    queryFn: async () => [],
-    notImplementedMessage: '선택한 조합은 아직 준비 중입니다.',
-  };
-}
-
 type UseRealtimeStockChartResult = {
-  items: DomesticRankingItem[];
+  items: StockRankingItem[];
   isLoading: boolean;
   isFetching: boolean;
   error: string | null;
@@ -94,11 +38,59 @@ function formatTime(timestamp: number | null | undefined) {
   return `${h}:${m}`;
 }
 
+function resolveRankingQuery(
+  region: string,
+  metricLabel: string
+): ResolvedRankingQuery {
+  const regionFilter: RegionFilter =
+    region === '국내' || region === '해외' ? (region as RegionFilter) : '전체';
+
+  let rankingMetric: RankingMetric | null = null;
+  if (metricLabel.includes('거래대금')) rankingMetric = 'amount';
+  else if (metricLabel.includes('거래량')) rankingMetric = 'volume';
+  else if (metricLabel.includes('급상승')) rankingMetric = 'rise';
+  else if (metricLabel.includes('급하락')) rankingMetric = 'fall';
+
+  if (!rankingMetric) {
+    return {
+      queryKey: ['ranking', regionFilter, 'unknown'],
+      enabled: false,
+      queryFn: async () => [],
+      notImplementedMessage: '선택한 지표는 아직 준비 중입니다.',
+    };
+  }
+
+  if (regionFilter === '국내' || regionFilter === '전체') {
+    const apiMetric: DomesticRankingMetric = rankingMetric;
+    return {
+      queryKey: ['ranking', 'domestic', apiMetric],
+      enabled: true,
+      queryFn: () => fetchDomesticRanking(apiMetric),
+    };
+  }
+
+  if (regionFilter === '해외') {
+    const apiMetric: OverseasRankingMetric = rankingMetric;
+    return {
+      queryKey: ['ranking', 'overseas', apiMetric],
+      enabled: true,
+      queryFn: () => fetchOverseasRanking(apiMetric),
+    };
+  }
+
+  return {
+    queryKey: ['ranking', regionFilter, 'unknown'],
+    enabled: false,
+    queryFn: async () => [],
+    notImplementedMessage: '선택한 조합은 아직 준비 중입니다.',
+  };
+}
+
 export function useRealtimeStockChart(
   region: string,
-  metric: string
+  metricLabel: string
 ): UseRealtimeStockChartResult {
-  const resolved = resolveRankingQuery(region, metric);
+  const resolved = resolveRankingQuery(region, metricLabel);
 
   const {
     data,
@@ -107,7 +99,7 @@ export function useRealtimeStockChart(
     error: queryError,
     dataUpdatedAt,
     refetch,
-  } = useQuery<DomesticRankingItem[], Error>({
+  } = useQuery<StockRankingItem[], Error>({
     queryKey: resolved.queryKey,
     queryFn: resolved.queryFn,
     enabled: resolved.enabled,
