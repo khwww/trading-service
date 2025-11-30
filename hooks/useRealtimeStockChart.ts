@@ -10,7 +10,7 @@ import {
 } from '@/services/kisRankingClient';
 
 type RegionFilter = '전체' | '국내' | '해외';
-type RankingMetric = 'amount' | 'volume' | 'rise' | 'fall';
+type RankingMetric = DomesticRankingMetric;
 
 type StockRankingItem = DomesticRankingItem;
 
@@ -38,6 +38,14 @@ function formatTime(timestamp: number | null | undefined) {
   return `${h}:${m}`;
 }
 
+function resolveRankingMetric(metricLabel: string): RankingMetric | null {
+  if (metricLabel.includes('거래대금')) return 'amount';
+  if (metricLabel.includes('거래량')) return 'volume';
+  if (metricLabel.includes('급상승')) return 'rise';
+  if (metricLabel.includes('급하락')) return 'fall';
+  return null;
+}
+
 function resolveRankingQuery(
   region: string,
   metricLabel: string
@@ -45,11 +53,7 @@ function resolveRankingQuery(
   const regionFilter: RegionFilter =
     region === '국내' || region === '해외' ? (region as RegionFilter) : '전체';
 
-  let rankingMetric: RankingMetric | null = null;
-  if (metricLabel.includes('거래대금')) rankingMetric = 'amount';
-  else if (metricLabel.includes('거래량')) rankingMetric = 'volume';
-  else if (metricLabel.includes('급상승')) rankingMetric = 'rise';
-  else if (metricLabel.includes('급하락')) rankingMetric = 'fall';
+  const rankingMetric = resolveRankingMetric(metricLabel);
 
   if (!rankingMetric) {
     return {
@@ -60,8 +64,10 @@ function resolveRankingQuery(
     };
   }
 
-  if (regionFilter === '국내' || regionFilter === '전체') {
+  // 국내
+  if (regionFilter === '국내') {
     const apiMetric: DomesticRankingMetric = rankingMetric;
+
     return {
       queryKey: ['ranking', 'domestic', apiMetric],
       enabled: true,
@@ -69,8 +75,10 @@ function resolveRankingQuery(
     };
   }
 
+  // 해외
   if (regionFilter === '해외') {
     const apiMetric: OverseasRankingMetric = rankingMetric;
+
     return {
       queryKey: ['ranking', 'overseas', apiMetric],
       enabled: true,
@@ -78,6 +86,40 @@ function resolveRankingQuery(
     };
   }
 
+  // 전체
+  if (regionFilter === '전체') {
+    const domesticMetric: DomesticRankingMetric = rankingMetric;
+    const overseasMetric: OverseasRankingMetric = rankingMetric;
+
+    return {
+      queryKey: ['ranking', 'all', rankingMetric],
+      enabled: true,
+      queryFn: async () => {
+        const [domestic, overseas] = await Promise.all([
+          fetchDomesticRanking(domesticMetric),
+          fetchOverseasRanking(overseasMetric),
+        ]);
+
+        const combined: StockRankingItem[] = [...domestic, ...overseas];
+
+        switch (rankingMetric) {
+          case 'volume':
+            combined.sort((a, b) => b.volume - a.volume);
+            break;
+          case 'amount':
+            combined.sort((a, b) => b.amount - a.amount);
+            break;
+          case 'rise':
+            combined.sort((a, b) => b.changeRate - a.changeRate);
+            break;
+          case 'fall':
+            combined.sort((a, b) => a.changeRate - b.changeRate);
+            break;
+        }
+        return combined;
+      },
+    };
+  }
   return {
     queryKey: ['ranking', regionFilter, 'unknown'],
     enabled: false,
