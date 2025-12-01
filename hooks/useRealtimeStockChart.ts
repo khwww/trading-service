@@ -10,7 +10,7 @@ import {
 } from '@/services/kisRankingClient';
 
 type RegionFilter = '전체' | '국내' | '해외';
-type RankingMetric = DomesticRankingMetric;
+type RankingMetric = 'amount' | 'volume' | 'rise' | 'fall';
 
 type StockRankingItem = DomesticRankingItem;
 
