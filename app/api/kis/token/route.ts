@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+const BASE_URL = process.env.KIS_BASE_URL;
+
 export async function POST() {
   try {
     const appKey = process.env.KIS_APP_KEY;
@@ -12,8 +14,7 @@ export async function POST() {
       );
     }
 
-    const baseUrl = 'https://openapi.koreainvestment.com:9443';
-    const url = `${baseUrl}/oauth2/tokenP`;
+    const url = `${BASE_URL}/oauth2/tokenP`;
 
     const res = await fetch(url, {
       method: 'POST',
