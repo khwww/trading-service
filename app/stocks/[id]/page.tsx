@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import StockHeader from '@/components/detail/StockHeader';
 import StockChart from '@/components/detail/StockChart';
@@ -17,6 +17,10 @@ export default function StockDetailPage({ params }: PageProps) {
   const searchParams = useSearchParams();
   const stockName = searchParams.get('name') || '';
   const market = (searchParams.get('market') || 'DOMESTIC') as MarketType;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
