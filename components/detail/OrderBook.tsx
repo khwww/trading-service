@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useStockDaily } from '@/hooks/useStockDaily';
+import { useOverseasStockDaily } from '@/hooks/useOverseasStockDaily';
 import { useRealtimePrice } from '@/hooks/useRealtimePrice';
+
+type MarketType = 'DOMESTIC' | 'OVERSEAS';
 
 type OrderBookProps = {
   stockCode: string;
+  market: MarketType;
 };
 
 type Trade = {
@@ -41,19 +45,24 @@ function formatTime(date: Date) {
   return `${h}:${m}:${s}`;
 }
 
-export default function OrderBook({ stockCode }: OrderBookProps) {
+export default function OrderBook({ stockCode, market }: OrderBookProps) {
+  const isDomestic = market === 'DOMESTIC';
   const [activeTab, setActiveTab] = useState<'realtime' | 'daily'>('daily');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [tradeId, setTradeId] = useState(0);
 
   // 일별 시세 (일별 탭용)
-  const { data: dailyData, isLoading: dailyLoading, error: dailyError } = useStockDaily(stockCode);
+  const domesticDaily = useStockDaily(isDomestic ? stockCode : '');
+  const overseasDaily = useOverseasStockDaily(isDomestic ? '' : stockCode);
+  const { data: dailyData, isLoading: dailyLoading, error: dailyError } = isDomestic
+    ? domesticDaily
+    : overseasDaily;
 
-  // 실시간 체결가 (실시간 탭용)
-  const { ticksByKey } = useRealtimePrice([
-    { symbol: stockCode, market: 'DOMESTIC' },
-  ]);
-  const realtimeTick = ticksByKey[`DOMESTIC:${stockCode}`];
+  // 실시간 체결가 (국내 주식, 실시간 탭용)
+  const { ticksByKey } = useRealtimePrice(
+    isDomestic ? [{ symbol: stockCode, market: 'DOMESTIC' }] : []
+  );
+  const realtimeTick = isDomestic ? ticksByKey[`DOMESTIC:${stockCode}`] : null;
 
   // 실시간 틱이 들어올 때마다 체결 내역에 추가
   useEffect(() => {
@@ -110,16 +119,18 @@ export default function OrderBook({ stockCode }: OrderBookProps) {
         >
           일별
         </button>
-        <button
-          className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
-            activeTab === 'realtime'
-              ? 'text-white border-b-2 border-white'
-              : 'text-gray-400 hover:text-gray-300'
-          }`}
-          onClick={() => setActiveTab('realtime')}
-        >
-          실시간
-        </button>
+        {isDomestic && (
+          <button
+            className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+              activeTab === 'realtime'
+                ? 'text-white border-b-2 border-white'
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+            onClick={() => setActiveTab('realtime')}
+          >
+            실시간
+          </button>
+        )}
       </div>
 
       {activeTab === 'realtime' ? (
@@ -185,12 +196,19 @@ export default function OrderBook({ stockCode }: OrderBookProps) {
               const isUp = item.changeSign === '1' || item.changeSign === '2';
               const isDown = item.changeSign === '4' || item.changeSign === '5';
 
+              const formatPrice = (price: number) => {
+                if (isDomestic) {
+                  return `${price.toLocaleString()}원`;
+                }
+                return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+              };
+
               return (
                 <div key={item.date} className="flex border-b border-gray-900 hover:bg-gray-900 py-2">
                   <div className="flex-1 text-gray-400">{formatDate(item.date)}</div>
-                  <div className="flex-1 text-right">{item.close.toLocaleString()}원</div>
+                  <div className="flex-1 text-right">{formatPrice(item.close)}</div>
                   <div className={`flex-1 text-right ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
-                    {isUp ? '+' : ''}{item.changeRate}%
+                    {isUp ? '+' : ''}{item.changeRate.toFixed(2)}%
                   </div>
                   <div className="flex-1 text-right text-gray-400 pr-2">
                     {formatVolume(item.volume)}

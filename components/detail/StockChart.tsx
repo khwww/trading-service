@@ -13,10 +13,21 @@ import {
   Tooltip,
 } from "recharts";
 import { useStockDaily } from "@/hooks/useStockDaily";
+import { useOverseasStockDaily } from "@/hooks/useOverseasStockDaily";
 import { Grid3X3, TrendingUp, BarChart3 } from "lucide-react";
 
+type MarketType = 'DOMESTIC' | 'OVERSEAS';
+
 // 커스텀 툴팁 컴포넌트
-function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ value: number; payload: { time: string; changeSign: string } }> }) {
+function CustomTooltip({
+  active,
+  payload,
+  isDomestic
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number; payload: { time: string; changeSign: string } }>;
+  isDomestic?: boolean;
+}) {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0];
@@ -24,9 +35,16 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   const changeSign = data.payload.changeSign;
   const isUp = changeSign === '1' || changeSign === '2';
 
+  const formatPrice = (p: number) => {
+    if (isDomestic) {
+      return `${p.toLocaleString()}원`;
+    }
+    return `$${p.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
   return (
     <div className={`${isUp ? 'bg-red-500' : 'bg-blue-500'} text-white px-3 py-1 rounded text-sm shadow-lg`}>
-      <div className="font-semibold">{price.toLocaleString()}원</div>
+      <div className="font-semibold">{formatPrice(price)}</div>
       <div className="text-xs opacity-80">{data.payload.time}</div>
     </div>
   );
@@ -46,12 +64,21 @@ function formatDate(dateStr: string) {
 
 type StockChartProps = {
   stockCode: string;
+  market: MarketType;
 };
 
 type ChartType = 'area' | 'line';
 
-export default function StockChart({ stockCode }: StockChartProps) {
-  const { data, isLoading, error } = useStockDaily(stockCode);
+export default function StockChart({ stockCode, market }: StockChartProps) {
+  const isDomestic = market === 'DOMESTIC';
+
+  // 국내 주식 데이터
+  const domesticQuery = useStockDaily(isDomestic ? stockCode : '');
+  // 해외 주식 데이터
+  const overseasQuery = useOverseasStockDaily(isDomestic ? '' : stockCode);
+
+  const { data, isLoading, error } = isDomestic ? domesticQuery : overseasQuery;
+
   const isMounted = useSyncExternalStore(
     subscribe,
     () => true,
@@ -61,9 +88,11 @@ export default function StockChart({ stockCode }: StockChartProps) {
   const [showGrid, setShowGrid] = useState(true);
   const [chartType, setChartType] = useState<ChartType>('area');
 
-  // 차트용 데이터 변환 (날짜 오름차순 정렬)
+  // 차트용 데이터 변환 (최근 30일, 날짜 오름차순 정렬)
+  const CHART_DAYS = 30;
   const chartData = data
     ? [...data]
+        .slice(0, CHART_DAYS) // 최근 30일만 사용
         .reverse()
         .map((item) => ({
           time: formatDate(item.date),
@@ -138,7 +167,7 @@ export default function StockChart({ stockCode }: StockChartProps) {
                   </linearGradient>
                 </defs>
                 {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip isDomestic={isDomestic} />} />
                 <XAxis
                   dataKey="time"
                   stroke="#666"
@@ -147,8 +176,12 @@ export default function StockChart({ stockCode }: StockChartProps) {
                 <YAxis
                   stroke="#666"
                   tick={{ fill: "#999", fontSize: 12 }}
-                  domain={["dataMin - 1000", "dataMax + 1000"]}
-                  tickFormatter={(value) => value.toLocaleString()}
+                  domain={isDomestic ? ["dataMin - 1000", "dataMax + 1000"] : ["auto", "auto"]}
+                  tickFormatter={(value) =>
+                    isDomestic
+                      ? value.toLocaleString()
+                      : `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                  }
                 />
                 <Area
                   type="monotone"
@@ -161,7 +194,7 @@ export default function StockChart({ stockCode }: StockChartProps) {
             ) : (
               <LineChart data={chartData}>
                 {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip isDomestic={isDomestic} />} />
                 <XAxis
                   dataKey="time"
                   stroke="#666"
@@ -170,8 +203,12 @@ export default function StockChart({ stockCode }: StockChartProps) {
                 <YAxis
                   stroke="#666"
                   tick={{ fill: "#999", fontSize: 12 }}
-                  domain={["dataMin - 1000", "dataMax + 1000"]}
-                  tickFormatter={(value) => value.toLocaleString()}
+                  domain={isDomestic ? ["dataMin - 1000", "dataMax + 1000"] : ["auto", "auto"]}
+                  tickFormatter={(value) =>
+                    isDomestic
+                      ? value.toLocaleString()
+                      : `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                  }
                 />
                 <Line
                   type="monotone"
