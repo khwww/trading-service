@@ -1,16 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import StockFilter from '@/components/main/StockFilter';
 import StockTable from '@/components/main/StockTable';
 import { useRealtimeStockChart } from '@/hooks/useRealtimeStockChart';
 import type { MarketType } from '@/lib/kis/KISRealtimePriceManager';
 import { useRealtimePrice } from '@/hooks/useRealtimePrice';
+import { useFavoriteStock } from '@/hooks/useFavoriteStock';
+import { fetchAuthUser, type AuthUser } from '@/services/fetchAuthUser';
+import type {
+  DomesticRankingItem,
+  OverseasRankingItem,
+} from '@/services/kisRankingClient';
+
+type StockRankingItem = DomesticRankingItem | OverseasRankingItem;
 
 export default function StockRanking() {
   const [region, setRegion] = useState<string>('전체');
   const [metric, setMetric] = useState<string>('거래대금');
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [user, setUser] = useState<AuthUser>(null);
+
+  useEffect(() => {
+    let canceled = false;
+
+    async function initAuth() {
+      try {
+        const cached = localStorage.getItem('stockdodo:user');
+        if (cached && !canceled) {
+          setUser(JSON.parse(cached));
+        }
+      } catch (e) {
+        console.error('failed to parse cached user', e);
+      }
+
+      const me = await fetchAuthUser();
+      if (!canceled) {
+        setUser(me);
+      }
+    }
+
+    initAuth();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  const userKey = user?.id ?? null;
+  const { isFavorite, toggleFavorite } = useFavoriteStock(userKey);
 
   const { items, isLoading, error, lastUpdated } = useRealtimeStockChart(
     region,
@@ -51,7 +88,7 @@ export default function StockRanking() {
     );
   }
 
-  const mergedItems = items.map((item) => {
+  const mergedItems: StockRankingItem[] = items.map((item) => {
     const key = `DOMESTIC:${item.code}`;
     const tick = ticksByKey[key];
 
@@ -66,12 +103,26 @@ export default function StockRanking() {
     return merged;
   });
 
-  const toggleFavorite = (id: number, e: React.MouseEvent) => {
+  const handleToggleFavorite = (
+    stock: StockRankingItem,
+    e: React.MouseEvent
+  ) => {
     e.preventDefault();
     e.stopPropagation();
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
-    );
+
+    if (!userKey) {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+
+    toggleFavorite({
+      code: stock.code,
+      name: stock.name,
+      market: stock.market,
+      price: typeof stock.price === 'number' ? stock.price : undefined,
+      changeRate:
+        typeof stock.changeRate === 'number' ? stock.changeRate : undefined,
+    });
   };
 
   return (
@@ -84,8 +135,8 @@ export default function StockRanking() {
       />
       <StockTable
         stocks={mergedItems}
-        favorites={favorites}
-        onToggleFavorite={toggleFavorite}
+        isFavorite={isFavorite}
+        onToggleFavorite={handleToggleFavorite}
         lastUpdated={lastUpdated}
         metricType={metric}
       />
