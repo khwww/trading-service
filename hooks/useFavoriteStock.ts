@@ -1,10 +1,12 @@
 'use client';
 
+import { MarketType } from '@/lib/kis/KISRealtimePriceManager';
 import { useEffect, useState } from 'react';
 
 export type FavoriteStock = {
   code: string;
   name: string;
+  market: MarketType;
   price?: number | string;
   change?: number | string;
   changeRate?: number | string;
@@ -36,6 +38,7 @@ export function useFavoriteStock(userKey: string | null) {
     }
   }, [storageKey]);
 
+  // 변경사항 저장
   useEffect(() => {
     if (!storageKey) return;
     if (!hydrated) return;
@@ -51,9 +54,7 @@ export function useFavoriteStock(userKey: string | null) {
     favorites.some((item) => item.code === code);
 
   const toggleFavorite = (stock: FavoriteStock) => {
-    if (!storageKey) {
-      return;
-    }
+    if (!storageKey) return;
 
     setFavorites((prev) => {
       const exists = prev.some((item) => item.code === stock.code);
@@ -64,5 +65,11 @@ export function useFavoriteStock(userKey: string | null) {
     });
   };
 
-  return { favorites, isFavorite, toggleFavorite, hydrated };
+  const removeFavorite = (code: string) => {
+    if (!storageKey) return;
+
+    setFavorites((prev) => prev.filter((item) => item.code !== code));
+  };
+
+  return { favorites, isFavorite, toggleFavorite, removeFavorite, hydrated };
 }

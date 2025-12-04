@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { fetchAuthUser, type AuthUser } from '@/services/fetchAuthUser';
 import { useFavoriteStock } from '@/hooks/useFavoriteStock';
+import { useRealtimePrice } from '@/hooks/useRealtimePrice';
+import type { MarketType } from '@/lib/kis/KISRealtimePriceManager';
+import { Heart } from 'lucide-react';
 import ChangeRateCell from '../main/ChangeRateCell';
 
 export default function FavoritesPanel() {
@@ -36,8 +39,36 @@ export default function FavoritesPanel() {
   }, []);
 
   const userKey = user?.id ?? null;
-  const { favorites, hydrated } = useFavoriteStock(userKey);
+  const { favorites, hydrated, removeFavorite } = useFavoriteStock(userKey);
   const isLoggedIn = !!userKey;
+
+  const symbols = useMemo(
+    () =>
+      favorites.map((stock) => ({
+        symbol: stock.code,
+        market: stock.market as MarketType,
+      })),
+    [favorites]
+  );
+
+  const { ticksByKey } = useRealtimePrice(symbols);
+
+  const mergedFavorites = useMemo(
+    () =>
+      favorites.map((stock) => {
+        const key = `${stock.market}:${stock.code}`;
+        const tick = ticksByKey[key];
+
+        if (!tick) return stock;
+
+        return {
+          ...stock,
+          price: tick.price,
+          changeRate: tick.changeRate,
+        };
+      }),
+    [favorites, ticksByKey]
+  );
 
   return (
     <div
@@ -49,9 +80,11 @@ export default function FavoritesPanel() {
           display: none;
         }
       `}</style>
+
       <div className="p-3 border-b border-gray-800">
         <h2 className="text-base font-bold">관심</h2>
       </div>
+
       <div className="p-3">
         {authLoading || !hydrated ? (
           <div className="text-xs text-gray-400">불러오는 중...</div>
@@ -61,7 +94,7 @@ export default function FavoritesPanel() {
             <br />
             관심 종목을 등록하려면 먼저 로그인해주세요.
           </div>
-        ) : favorites.length === 0 ? (
+        ) : mergedFavorites.length === 0 ? (
           <div className="text-xs text-gray-400">
             아직 등록된 관심 종목이 없습니다.
             <br />
@@ -69,37 +102,56 @@ export default function FavoritesPanel() {
           </div>
         ) : (
           <div className="space-y-1.5">
-            {favorites.map((stock) => (
-              <div
-                key={stock.code}
-                className="flex items-center gap-2 py-2 hover:bg-zinc-800 cursor-pointer rounded px-2"
-              >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-800 text-xs">
-                  {stock.name.slice(0, 2)}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm">{stock.name}</div>
+            {mergedFavorites.map((stock) => {
+              const displayPrice =
+                typeof stock.price === 'number'
+                  ? stock.price
+                  : stock.price
+                    ? Number(stock.price)
+                    : null;
+
+              const displayChangeRate =
+                typeof stock.changeRate === 'number'
+                  ? stock.changeRate
+                  : typeof stock.changeRate === 'string'
+                    ? parseFloat(stock.changeRate.replace('%', ''))
+                    : null;
+
+              return (
+                <div
+                  key={stock.code}
+                  className="group flex items-center gap-2 py-2 hover:bg-zinc-800 cursor-pointer rounded px-2"
+                >
+                  <button
+                    type="button"
+                    className="flex h-7 w-7 items-center justify-center rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFavorite?.(stock.code);
+                    }}
+                    aria-label="관심 종목 해제"
+                  >
+                    <Heart className="h-4 w-4 fill-red-500 text-red-500 group-hover:scale-110 transition-transform" />
+                  </button>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm truncate">{stock.name}</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {displayPrice != null && (
+                      <div className="text-sm">
+                        {displayPrice.toLocaleString()}원
+                      </div>
+                    )}
+                    {displayChangeRate != null && (
+                      <div className="mt-1">
+                        <ChangeRateCell value={displayChangeRate} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right shrink-0">
-                  {stock.price && (
-                    <div className="text-sm">
-                      {stock.price.toLocaleString()}원
-                    </div>
-                  )}
-                  {stock.changeRate != null && (
-                    <div className="mt-1">
-                      <ChangeRateCell
-                        value={
-                          typeof stock.changeRate === 'number'
-                            ? stock.changeRate
-                            : parseFloat(stock.changeRate.replace('%', ''))
-                        }
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

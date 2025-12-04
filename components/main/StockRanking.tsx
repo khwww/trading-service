@@ -118,6 +118,7 @@ export default function StockRanking() {
     toggleFavorite({
       code: stock.code,
       name: stock.name,
+      market: stock.market,
       price: typeof stock.price === 'number' ? stock.price : undefined,
       changeRate:
         typeof stock.changeRate === 'number' ? stock.changeRate : undefined,
