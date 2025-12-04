@@ -1,3 +1,5 @@
+export type MarketType = 'DOMESTIC' | 'OVERSEAS';
+
 export type DomesticRankingMetric = 'volume' | 'amount' | 'rise' | 'fall';
 
 export type DomesticRankingItem = {
@@ -8,6 +10,7 @@ export type DomesticRankingItem = {
   volume: number; // 거래량
   amount: number; // 거래대금
   prevVolume: number; // 전일 거래량
+  market: 'DOMESTIC';
 };
 
 // KIS 랭킹 API 공통 row 타입
@@ -60,11 +63,21 @@ export async function fetchDomesticRanking(
     volume: Number(row.acml_vol), // 누적 거래량
     amount: Number(row.acml_tr_pbmn), // 누적 거래대금
     prevVolume: Number(row.prdy_vol), // 전일 거래량
+    market: 'DOMESTIC',
   }));
 }
 
 export type OverseasRankingMetric = DomesticRankingMetric;
-export type OverseasRankingItem = DomesticRankingItem;
+export type OverseasRankingItem = {
+  code: string;
+  name: string;
+  price: number;
+  changeRate: number;
+  volume: number;
+  amount: number;
+  prevVolume: number;
+  market: 'OVERSEAS';
+};
 
 type KISOverseasRankingRow = {
   symb: string; // 종목코드
@@ -104,5 +117,6 @@ export async function fetchOverseasRanking(
     volume: Number(row.tvol),
     amount: Number(row.tamt ?? 0),
     prevVolume: Number(row.n_tvol ?? 0),
+    market: 'OVERSEAS',
   }));
 }

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: oklch(0.065 0.003 264);
@@ -89,4 +89,36 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes change-flash-up {
+  0% {
+    background-color: color-mix(in oklch, red 40%, transparent);
+  }
+  40% {
+    background-color: color-mix(in oklch, red 22%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes change-flash-down {
+  0% {
+    background-color: color-mix(in oklch, dodgerblue 40%, transparent);
+  }
+  40% {
+    background-color: color-mix(in oklch, dodgerblue 22%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.change-flash-up {
+  animation: change-flash-up 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.change-flash-down {
+  animation: change-flash-down 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
