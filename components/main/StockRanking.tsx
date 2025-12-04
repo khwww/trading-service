@@ -4,6 +4,8 @@ import { useState } from 'react';
 import StockFilter from '@/components/main/StockFilter';
 import StockTable from '@/components/main/StockTable';
 import { useRealtimeStockChart } from '@/hooks/useRealtimeStockChart';
+import type { MarketType } from '@/lib/kis/KISRealtimePriceManager';
+import { useRealtimePrice } from '@/hooks/useRealtimePrice';
 
 export default function StockRanking() {
   const [region, setRegion] = useState<string>('전체');
@@ -14,6 +16,18 @@ export default function StockRanking() {
     region,
     metric
   );
+
+  const isDomesticView = region === '국내' || region === '전체';
+  const domesticSymbols = isDomesticView
+    ? items
+        .filter((item) => item.market === 'DOMESTIC')
+        .map((item) => ({
+          symbol: item.code,
+          market: 'DOMESTIC' as MarketType,
+        }))
+    : [];
+
+  const { ticksByKey } = useRealtimePrice(domesticSymbols);
 
   if (isLoading) {
     return <div className="mt-6">데이터를 불러오는 중입니다...</div>;
@@ -37,6 +51,21 @@ export default function StockRanking() {
     );
   }
 
+  const mergedItems = items.map((item) => {
+    const key = `DOMESTIC:${item.code}`;
+    const tick = ticksByKey[key];
+
+    if (!tick) return item;
+
+    const merged = {
+      ...item,
+      price: tick.price,
+      changeRate: tick.changeRate,
+    };
+    console.log('[MERGED]', key, { base: item, tick, merged });
+    return merged;
+  });
+
   const toggleFavorite = (id: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -54,7 +83,7 @@ export default function StockRanking() {
         onMetricChange={setMetric}
       />
       <StockTable
-        stocks={items}
+        stocks={mergedItems}
         favorites={favorites}
         onToggleFavorite={toggleFavorite}
         lastUpdated={lastUpdated}
