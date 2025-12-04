@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import StockHeader from '@/components/detail/StockHeader';
 import StockChart from '@/components/detail/StockChart';
 import OrderBook from '@/components/detail/OrderBook';
+import { addRecentStock } from '@/lib/recentStocks';
 
 export type MarketType = 'DOMESTIC' | 'OVERSEAS';
 
@@ -20,7 +21,16 @@ export default function StockDetailPage({ params }: PageProps) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    // 최근 본 종목에 추가
+    if (stockCode && stockName) {
+      addRecentStock({
+        code: stockCode,
+        name: stockName,
+        market,
+      });
+    }
+  }, [stockCode, stockName, market]);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
