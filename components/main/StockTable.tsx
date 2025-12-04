@@ -14,17 +14,17 @@ type StockRankingItem = DomesticRankingItem | OverseasRankingItem;
 
 type StockTableProps = {
   stocks: StockRankingItem[];
-  favorites: number[];
   lastUpdated?: string;
   metricType: string;
-  onToggleFavorite: (id: number, e: React.MouseEvent) => void;
+  isFavorite: (code: string) => boolean;
+  onToggleFavorite: (stock: StockRankingItem, e: React.MouseEvent) => void;
 };
 
 export default function StockTable({
   stocks,
-  favorites,
   lastUpdated,
   metricType,
+  isFavorite,
   onToggleFavorite,
 }: StockTableProps) {
   const router = useRouter();
@@ -58,6 +58,9 @@ export default function StockTable({
                 todayRatio = (todayVol / totalVol) * 100;
                 prevRatio = 100 - todayRatio;
               }
+
+              const favorite = isFavorite(stock.code);
+
               return (
                 <tr
                   key={stock.code}
@@ -69,12 +72,12 @@ export default function StockTable({
                       <button
                         type="button"
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition-all"
-                        onClick={(e) => onToggleFavorite(Number(stock.code), e)}
+                        onClick={(e) => onToggleFavorite(stock, e)}
                       >
                         <Heart
                           className={cn(
-                            'h-4 w-4 transition-all',
-                            favorites.includes(Number(stock.code))
+                            'h-4 w-4 transition-all cursor-pointer',
+                            favorite
                               ? 'scale-110 fill-red-500 text-red-500'
                               : 'text-slate-500 group-hover:text-slate-300'
                           )}
@@ -83,7 +86,6 @@ export default function StockTable({
                       <span className="w-4 text-sm font-medium text-muted-foreground">
                         {index + 1}
                       </span>
-                      {/* <span className="text-sm">{stock.icon}</span> */}
                       <span className="text-sm">{stock.name}</span>
                     </div>
                   </td>
