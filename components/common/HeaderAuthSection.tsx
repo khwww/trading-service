@@ -20,6 +20,7 @@ export default function HeaderAuthSection({
       await fetch('/api/auth/logout', {
         method: 'POST',
       });
+      localStorage.removeItem('stockdodo:user');
       alert('로그아웃이 완료되었습니다.');
       window.location.reload();
     } catch (e) {
