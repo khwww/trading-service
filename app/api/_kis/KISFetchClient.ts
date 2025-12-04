@@ -1,4 +1,4 @@
-import { getServerAccessToken } from '@/services/kisServerAuth';
+import { fetchAccessToken } from '@/services/fetchAccessToken';
 
 const BASE_URL = process.env.KIS_BASE_URL;
 
@@ -19,7 +19,7 @@ export async function KISFetchClient<TResponse = unknown>(
 
   const appKey = process.env.KIS_APP_KEY;
   const appSecret = process.env.KIS_APP_SECRET;
-  const accessToken = await getServerAccessToken();
+  const accessToken = await fetchAccessToken();
 
   if (!appKey || !appSecret) {
     throw new Error('KIS env not configured');
