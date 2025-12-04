@@ -1,9 +1,11 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   AreaChart,
+  LineChart,
   Area,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -11,7 +13,7 @@ import {
   Tooltip,
 } from "recharts";
 import { useStockDaily } from "@/hooks/useStockDaily";
-import { TrendingUp, TrendingDown, Maximize2, Share2 } from "lucide-react";
+import { Grid3X3, TrendingUp, BarChart3 } from "lucide-react";
 
 // 커스텀 툴팁 컴포넌트
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ value: number; payload: { time: string; changeSign: string } }> }) {
@@ -46,6 +48,8 @@ type StockChartProps = {
   stockCode: string;
 };
 
+type ChartType = 'area' | 'line';
+
 export default function StockChart({ stockCode }: StockChartProps) {
   const { data, isLoading, error } = useStockDaily(stockCode);
   const isMounted = useSyncExternalStore(
@@ -53,6 +57,9 @@ export default function StockChart({ stockCode }: StockChartProps) {
     () => true,
     () => false
   );
+
+  const [showGrid, setShowGrid] = useState(true);
+  const [chartType, setChartType] = useState<ChartType>('area');
 
   // 차트용 데이터 변환 (날짜 오름차순 정렬)
   const chartData = data
@@ -70,7 +77,7 @@ export default function StockChart({ stockCode }: StockChartProps) {
 
   if (isLoading) {
     return (
-      <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+      <div className="text-white p-4 rounded-lg" style={{ background: 'var(--detail-section)' }}>
         <h2 className="text-lg font-semibold mb-4 leading-7">차트</h2>
         <div className="animate-pulse" style={{ height: "400px" }}>
           <div className="h-full bg-gray-700 rounded"></div>
@@ -81,7 +88,7 @@ export default function StockChart({ stockCode }: StockChartProps) {
 
   if (error || !data) {
     return (
-      <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+      <div className="text-white p-4 rounded-lg" style={{ background: 'var(--detail-section)' }}>
         <h2 className="text-lg font-semibold mb-4 leading-7">차트</h2>
         <div className="text-red-500">데이터를 불러오는데 실패했습니다.</div>
       </div>
@@ -89,46 +96,27 @@ export default function StockChart({ stockCode }: StockChartProps) {
   }
 
   return (
-    <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+    <div className="text-white p-4 rounded-lg" style={{ background: 'var(--detail-section)' }}>
       <h2 className="text-lg font-semibold mb-4 leading-7">차트</h2>
 
       {/* 차트 컨트롤 */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <button className="p-1.5 hover:bg-gray-800 rounded">
-            <TrendingUp size={18} />
+          {/* 그리드 토글 */}
+          <button
+            className={`p-1.5 rounded cursor-pointer ${showGrid ? 'bg-gray-700' : 'hover:bg-gray-800'}`}
+            onClick={() => setShowGrid(!showGrid)}
+            title="그리드 표시/숨김"
+          >
+            <Grid3X3 size={18} />
           </button>
-          <button className="p-1.5 hover:bg-gray-800 rounded">
-            <TrendingDown size={18} />
-          </button>
-          <button className="p-1.5 hover:bg-gray-800 rounded">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-          <button className="p-1.5 hover:bg-gray-800 rounded">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path d="M3 3h18v18H3z" />
-            </svg>
-          </button>
-          <button className="p-1.5 hover:bg-gray-800 rounded">
-            <Maximize2 size={18} />
-          </button>
-          <button className="p-1.5 hover:bg-gray-800 rounded">
-            <Share2 size={18} />
+          {/* 차트 타입 토글 */}
+          <button
+            className="p-1.5 rounded cursor-pointer hover:bg-gray-800"
+            onClick={() => setChartType(chartType === 'area' ? 'line' : 'area')}
+            title={chartType === 'area' ? '선 차트로 변경' : '면적 차트로 변경'}
+          >
+            {chartType === 'area' ? <TrendingUp size={18} /> : <BarChart3 size={18} />}
           </button>
         </div>
       </div>
@@ -137,38 +125,63 @@ export default function StockChart({ stockCode }: StockChartProps) {
       <div className="relative" style={{ height: "400px" }}>
         {isMounted && (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="colorUp" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#dc2626" stopOpacity={0.5} />
-                  <stop offset="95%" stopColor="#dc2626" stopOpacity={0.1} />
-                </linearGradient>
-                <linearGradient id="colorDown" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.5} />
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <Tooltip content={<CustomTooltip />} />
-              <XAxis
-                dataKey="time"
-                stroke="#666"
-                tick={{ fill: "#999", fontSize: 12 }}
-              />
-              <YAxis
-                stroke="#666"
-                tick={{ fill: "#999", fontSize: 12 }}
-                domain={["dataMin - 1000", "dataMax + 1000"]}
-                tickFormatter={(value) => value.toLocaleString()}
-              />
-              <Area
-                type="monotone"
-                dataKey="price"
-                stroke={isUp ? "#dc2626" : "#2563eb"}
-                strokeWidth={2}
-                fill={isUp ? "url(#colorUp)" : "url(#colorDown)"}
-              />
-            </AreaChart>
+            {chartType === 'area' ? (
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorUp" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#dc2626" stopOpacity={0.5} />
+                    <stop offset="95%" stopColor="#dc2626" stopOpacity={0.1} />
+                  </linearGradient>
+                  <linearGradient id="colorDown" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.5} />
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
+                <Tooltip content={<CustomTooltip />} />
+                <XAxis
+                  dataKey="time"
+                  stroke="#666"
+                  tick={{ fill: "#999", fontSize: 12 }}
+                />
+                <YAxis
+                  stroke="#666"
+                  tick={{ fill: "#999", fontSize: 12 }}
+                  domain={["dataMin - 1000", "dataMax + 1000"]}
+                  tickFormatter={(value) => value.toLocaleString()}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="price"
+                  stroke={isUp ? "#dc2626" : "#2563eb"}
+                  strokeWidth={2}
+                  fill={isUp ? "url(#colorUp)" : "url(#colorDown)"}
+                />
+              </AreaChart>
+            ) : (
+              <LineChart data={chartData}>
+                {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
+                <Tooltip content={<CustomTooltip />} />
+                <XAxis
+                  dataKey="time"
+                  stroke="#666"
+                  tick={{ fill: "#999", fontSize: 12 }}
+                />
+                <YAxis
+                  stroke="#666"
+                  tick={{ fill: "#999", fontSize: 12 }}
+                  domain={["dataMin - 1000", "dataMax + 1000"]}
+                  tickFormatter={(value) => value.toLocaleString()}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  stroke={isUp ? "#dc2626" : "#2563eb"}
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            )}
           </ResponsiveContainer>
         )}
       </div>

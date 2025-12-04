@@ -10,6 +10,7 @@ export type NormalizedTick = {
   price: number;
   change: number;
   changeRate: number;
+  volume: number;       // 체결량
   timestamp: string;
 };
 

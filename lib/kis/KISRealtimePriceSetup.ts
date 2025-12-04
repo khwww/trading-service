@@ -56,6 +56,7 @@ export function parseTick(raw: string): NormalizedTick | null {
       // const signStr  = fields[offset + 3]; // 부호
       const diffStr = fields[offset + 4]; // 전일 대비 (원)
       const rateStr = fields[offset + 5]; // 전일 대비율 (%)
+      const volumeStr = fields[offset + 12]; // 체결량
 
       if (!symbol) continue;
 
@@ -65,6 +66,7 @@ export function parseTick(raw: string): NormalizedTick | null {
         price: toNumberOrZero(priceStr),
         change: toNumberOrZero(diffStr),
         changeRate: toNumberOrZero(rateStr),
+        volume: toNumberOrZero(volumeStr),
         timestamp: timeStr,
       };
       console.log('[PARSED TICK]', tick);

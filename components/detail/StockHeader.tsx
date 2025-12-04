@@ -1,6 +1,7 @@
 'use client';
 
 import { useStockPrice } from '@/hooks/useStockPrice';
+import { useRealtimePrice } from '@/hooks/useRealtimePrice';
 
 type StockHeaderProps = {
   stockCode: string;
@@ -9,6 +10,16 @@ type StockHeaderProps = {
 
 export default function StockHeader({ stockCode, stockName }: StockHeaderProps) {
   const { data, isLoading, error } = useStockPrice(stockCode);
+
+  // WebSocket 실시간 가격 (장 시간에만 활성화)
+  const { ticksByKey } = useRealtimePrice([
+    { symbol: stockCode, market: 'DOMESTIC' },
+  ]);
+  const realtimeTick = ticksByKey[`DOMESTIC:${stockCode}`];
+
+  // 실시간 틱이 있으면 사용, 없으면 REST 데이터 사용
+  const displayPrice = realtimeTick?.price ?? data?.price ?? 0;
+  const displayChangeRate = realtimeTick?.changeRate ?? data?.changeRate ?? 0;
 
   if (isLoading) {
     return (
@@ -42,7 +53,7 @@ export default function StockHeader({ stockCode, stockName }: StockHeaderProps) 
 
       <div className="flex items-end gap-4">
         <div className="text-4xl font-bold">
-          {data.price.toLocaleString()}원
+          {displayPrice.toLocaleString()}원
         </div>
         <div className={`flex items-center gap-2 pb-1 ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
           <span className="text-sm">지난 장 대비</span>
@@ -50,7 +61,7 @@ export default function StockHeader({ stockCode, stockName }: StockHeaderProps) 
             {isUp ? '+' : ''}{data.change.toLocaleString()}원
           </span>
           <span className="text-lg font-semibold">
-            ({isUp ? '+' : ''}{data.changeRate}%)
+            ({displayChangeRate > 0 ? '+' : ''}{displayChangeRate.toFixed(2)}%)
           </span>
         </div>
       </div>

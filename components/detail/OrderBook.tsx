@@ -1,9 +1,19 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useStockDaily } from '@/hooks/useStockDaily';
+import { useRealtimePrice } from '@/hooks/useRealtimePrice';
 
 type OrderBookProps = {
   stockCode: string;
+};
+
+type Trade = {
+  id: number;
+  price: number;
+  volume: number;
+  changeRate: number;
+  time: string;
 };
 
 // 날짜 포맷 (YYYYMMDD -> MM.DD)
@@ -23,12 +33,48 @@ function formatVolume(volume: number) {
   return volume.toLocaleString();
 }
 
-export default function OrderBook({ stockCode }: OrderBookProps) {
-  const { data, isLoading, error } = useStockDaily(stockCode);
+// 현재 시간 포맷 (HH:MM:SS)
+function formatTime(date: Date) {
+  const h = String(date.getHours()).padStart(2, '0');
+  const m = String(date.getMinutes()).padStart(2, '0');
+  const s = String(date.getSeconds()).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
 
-  if (isLoading) {
+export default function OrderBook({ stockCode }: OrderBookProps) {
+  const [activeTab, setActiveTab] = useState<'realtime' | 'daily'>('daily');
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [tradeId, setTradeId] = useState(0);
+
+  // 일별 시세 (일별 탭용)
+  const { data: dailyData, isLoading: dailyLoading, error: dailyError } = useStockDaily(stockCode);
+
+  // 실시간 체결가 (실시간 탭용)
+  const { ticksByKey } = useRealtimePrice([
+    { symbol: stockCode, market: 'DOMESTIC' },
+  ]);
+  const realtimeTick = ticksByKey[`DOMESTIC:${stockCode}`];
+
+  // 실시간 틱이 들어올 때마다 체결 내역에 추가
+  useEffect(() => {
+    if (!realtimeTick) return;
+
+    const newTrade: Trade = {
+      id: tradeId,
+      price: realtimeTick.price,
+      volume: realtimeTick.volume,
+      changeRate: realtimeTick.changeRate,
+      time: formatTime(new Date()),
+    };
+
+    setTrades((prev) => [newTrade, ...prev.slice(0, 49)]); // 최근 50개 유지
+    setTradeId((prev) => prev + 1);
+  }, [realtimeTick?.price, realtimeTick?.changeRate]);
+
+  // 로딩/에러 상태 (일별 탭일 때만)
+  if (activeTab === 'daily' && dailyLoading) {
     return (
-      <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+      <div className="text-white p-4 rounded-lg" style={{ background: 'var(--detail-section)' }}>
         <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
         <div className="animate-pulse space-y-2">
           {[...Array(10)].map((_, i) => (
@@ -39,9 +85,9 @@ export default function OrderBook({ stockCode }: OrderBookProps) {
     );
   }
 
-  if (error || !data) {
+  if (activeTab === 'daily' && (dailyError || !dailyData)) {
     return (
-      <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+      <div className="text-white p-4 rounded-lg" style={{ background: 'var(--detail-section)' }}>
         <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
         <div className="text-red-500">데이터를 불러오는데 실패했습니다.</div>
       </div>
@@ -49,44 +95,112 @@ export default function OrderBook({ stockCode }: OrderBookProps) {
   }
 
   return (
-    <div className="text-white p-4" style={{ background: 'var(--detail-section)' }}>
+    <div className="text-white p-4 rounded-lg" style={{ background: 'var(--detail-section)' }}>
       <h2 className="text-lg font-semibold mb-4 leading-7">시세</h2>
 
-      <div
-        className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600 pr-2"
-        style={{ height: '438px' }}
-      >
-        <table className="w-full text-sm">
-          <thead className="sticky top-0 border-b border-gray-800" style={{ background: 'var(--detail-section)' }}>
-            <tr className="text-gray-400">
-              <th className="text-left py-2 font-normal">날짜</th>
-              <th className="text-right py-2 font-normal">종가</th>
-              <th className="text-right py-2 font-normal">등락률</th>
-              <th className="text-right py-2 font-normal pr-2">거래량</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => {
-              // changeSign: 1(상한), 2(상승), 3(보합), 4(하한), 5(하락)
+      {/* 탭 UI */}
+      <div className="flex mb-2 border-b border-gray-700">
+        <button
+          className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+            activeTab === 'daily'
+              ? 'text-white border-b-2 border-white'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
+          onClick={() => setActiveTab('daily')}
+        >
+          일별
+        </button>
+        <button
+          className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+            activeTab === 'realtime'
+              ? 'text-white border-b-2 border-white'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
+          onClick={() => setActiveTab('realtime')}
+        >
+          실시간
+        </button>
+      </div>
+
+      {activeTab === 'realtime' ? (
+        /* 실시간 체결 내역 */
+        <div className="text-sm">
+          {/* 헤더 (스크롤 영역 밖) */}
+          <div className="flex text-gray-400 border-b border-gray-800 py-2">
+            <div className="flex-1 text-left">체결가</div>
+            <div className="flex-1 text-right">체결량</div>
+            <div className="flex-1 text-right">등락률</div>
+            <div className="flex-1 text-right pr-2">시간</div>
+          </div>
+          {/* 바디 (스크롤 영역) */}
+          <div
+            className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600"
+            style={{ height: '356px' }}
+          >
+            {trades.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                장 시간에 실시간 체결 내역이 표시됩니다.
+              </div>
+            ) : (
+              trades.map((trade) => {
+                const isUp = trade.changeRate > 0;
+                const isDown = trade.changeRate < 0;
+
+                return (
+                  <div key={trade.id} className="flex border-b border-gray-900 hover:bg-gray-900 py-2">
+                    <div className={`flex-1 ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-white'}`}>
+                      {trade.price.toLocaleString()}원
+                    </div>
+                    <div className="flex-1 text-right text-gray-300">
+                      {trade.volume.toLocaleString()}
+                    </div>
+                    <div className={`flex-1 text-right ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
+                      {isUp ? '+' : ''}{trade.changeRate.toFixed(2)}%
+                    </div>
+                    <div className="flex-1 text-right text-gray-400 pr-2">
+                      {trade.time}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      ) : (
+        /* 일별 시세 */
+        <div className="text-sm">
+          {/* 헤더 (스크롤 영역 밖) */}
+          <div className="flex text-gray-400 border-b border-gray-800 py-2">
+            <div className="flex-1 text-left">날짜</div>
+            <div className="flex-1 text-right">종가</div>
+            <div className="flex-1 text-right">등락률</div>
+            <div className="flex-1 text-right pr-2">거래량</div>
+          </div>
+          {/* 바디 (스크롤 영역) */}
+          <div
+            className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600"
+            style={{ height: '356px' }}
+          >
+            {dailyData?.map((item) => {
               const isUp = item.changeSign === '1' || item.changeSign === '2';
               const isDown = item.changeSign === '4' || item.changeSign === '5';
 
               return (
-                <tr key={item.date} className="border-b border-gray-900 hover:bg-gray-900">
-                  <td className="py-2 text-gray-400">{formatDate(item.date)}</td>
-                  <td className="text-right">{item.close.toLocaleString()}원</td>
-                  <td className={`text-right ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
+                <div key={item.date} className="flex border-b border-gray-900 hover:bg-gray-900 py-2">
+                  <div className="flex-1 text-gray-400">{formatDate(item.date)}</div>
+                  <div className="flex-1 text-right">{item.close.toLocaleString()}원</div>
+                  <div className={`flex-1 text-right ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
                     {isUp ? '+' : ''}{item.changeRate}%
-                  </td>
-                  <td className="text-right text-gray-400 pr-2">
+                  </div>
+                  <div className="flex-1 text-right text-gray-400 pr-2">
                     {formatVolume(item.volume)}
-                  </td>
-                </tr>
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         /* 커스텀 스크롤바 스타일 */
