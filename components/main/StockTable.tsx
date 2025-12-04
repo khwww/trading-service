@@ -1,12 +1,19 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { DomesticRankingItem } from '@/services/kisRankingClient';
+import {
+  DomesticRankingItem,
+  OverseasRankingItem,
+} from '@/services/kisRankingClient';
 import { Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+import ChangeRateCell from './ChangeRateCell';
+
+type StockRankingItem = DomesticRankingItem | OverseasRankingItem;
+
 type StockTableProps = {
-  stocks: DomesticRankingItem[];
+  stocks: StockRankingItem[];
   favorites: number[];
   lastUpdated?: string;
   metricType: string;
@@ -86,18 +93,7 @@ export default function StockTable({
                     </span>
                   </td>
                   <td className="p-3">
-                    <span
-                      className={cn(
-                        'inline-flex items-center rounded-full px-2 py-1 text-sm font-medium tabular-nums',
-                        stock.changeRate > 0
-                          ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
-                          : stock.changeRate < 0
-                            ? 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20'
-                            : 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20'
-                      )}
-                    >
-                      {stock.changeRate.toFixed(2)}%
-                    </span>
+                    <ChangeRateCell value={stock.changeRate} />
                   </td>
                   <td className="p-3">
                     <span className="text-sm tabular-nums">

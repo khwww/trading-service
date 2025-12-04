@@ -5,6 +5,7 @@ import {
   DomesticRankingItem,
   DomesticRankingMetric,
   OverseasRankingMetric,
+  OverseasRankingItem,
   fetchDomesticRanking,
   fetchOverseasRanking,
 } from '@/services/kisRankingClient';
@@ -12,7 +13,7 @@ import {
 type RegionFilter = '전체' | '국내' | '해외';
 type RankingMetric = 'amount' | 'volume' | 'rise' | 'fall';
 
-type StockRankingItem = DomesticRankingItem;
+type StockRankingItem = DomesticRankingItem | OverseasRankingItem;
 
 type ResolvedRankingQuery = {
   queryKey: (string | RegionFilter | RankingMetric)[];
