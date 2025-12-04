@@ -19,6 +19,7 @@ export default function StockHeader({ stockCode, stockName }: StockHeaderProps) 
 
   // 실시간 틱이 있으면 사용, 없으면 REST 데이터 사용
   const displayPrice = realtimeTick?.price ?? data?.price ?? 0;
+  const displayChange = realtimeTick?.change ?? data?.change ?? 0;
   const displayChangeRate = realtimeTick?.changeRate ?? data?.changeRate ?? 0;
 
   if (isLoading) {
@@ -40,9 +41,9 @@ export default function StockHeader({ stockCode, stockName }: StockHeaderProps) 
     );
   }
 
-  // changeSign: 1(상한), 2(상승), 3(보합), 4(하한), 5(하락)
-  const isUp = data.changeSign === '1' || data.changeSign === '2';
-  const isDown = data.changeSign === '4' || data.changeSign === '5';
+  // 실시간 데이터 기준으로 등락 판단 (색상용)
+  const isUp = displayChange > 0;
+  const isDown = displayChange < 0;
 
   return (
     <div className="bg-black text-white py-4">
@@ -58,7 +59,7 @@ export default function StockHeader({ stockCode, stockName }: StockHeaderProps) 
         <div className={`flex items-center gap-2 pb-1 ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
           <span className="text-sm">지난 장 대비</span>
           <span className="text-lg font-semibold">
-            {isUp ? '+' : ''}{data.change.toLocaleString()}원
+            {displayChange > 0 ? '+' : ''}{displayChange.toLocaleString()}원
           </span>
           <span className="text-lg font-semibold">
             ({displayChangeRate > 0 ? '+' : ''}{displayChangeRate.toFixed(2)}%)
