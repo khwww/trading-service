@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { KISWebsocketClient } from './KISWebsocketClient';
+import { KISWebsocketClient } from "./KISWebsocketClient";
 
-export type MarketType = 'DOMESTIC' | 'OVERSEAS';
+export type MarketType = "DOMESTIC" | "OVERSEAS";
 
 export type NormalizedTick = {
   symbol: string;
@@ -10,6 +10,8 @@ export type NormalizedTick = {
   price: number;
   change: number;
   changeRate: number;
+  volume: number; // 체결량
+  accumulatedVolume: number; // 누적거래량
   timestamp: string;
 };
 
@@ -106,7 +108,7 @@ export class KISRealtimePriceManager {
     if (!tick) return;
 
     const key = makeKey(tick.symbol, tick.market);
-    console.log('[MANAGER] tick', tick);
+    // console.log('[MANAGER] tick', tick);
     const entry = this.subscriptions.get(key);
 
     if (!entry) return;

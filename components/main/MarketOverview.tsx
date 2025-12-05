@@ -1,42 +1,79 @@
-const marketData = [
-  {
-    name: '달러 환율',
-    value: '1,443.25',
-    change: '+13.15',
-    changePercent: '0.91%',
-    isPositive: true,
-  },
-  {
-    name: '나스닥',
-    value: '22,740.39',
-    change: '-213.27',
-    changePercent: '0.92%',
-    isPositive: false,
-  },
-  {
-    name: 'S&P 500',
-    value: '6,699.40',
-    change: '-35.95',
-    changePercent: '0.53%',
-    isPositive: false,
-  },
-  {
-    name: '다우존스',
-    value: '44,722.06',
-    change: '+25.14',
-    changePercent: '0.06%',
-    isPositive: true,
-  },
-];
+"use client";
+
+import { useMarketOverview } from "@/hooks/useMarketOverview";
+
+function isExchangeRate(code: string) {
+  return code.startsWith("FX@");
+}
+
+// 값 포맷팅
+function formatValue(value: number, code: string) {
+  if (isExchangeRate(code)) {
+    return value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+// 변동값 포맷팅
+function formatChange(change: number, code: string) {
+  const sign = change >= 0 ? "+" : "";
+  if (isExchangeRate(code)) {
+    return `${sign}${change.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+  return `${sign}${change.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
 
 export default function MarketOverview() {
+  const { data, isLoading, error } = useMarketOverview();
+
+  if (isLoading) {
+    return (
+      <div className="mb-4">
+        <div className="flex gap-3 pb-1.5">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="min-w-[180px] rounded-lg border border-border/50 bg-card p-3 shadow-sm animate-pulse"
+            >
+              <div className="h-4 bg-gray-700 rounded w-20 mb-2"></div>
+              <div className="h-6 bg-gray-700 rounded w-28 mb-1"></div>
+              <div className="h-4 bg-gray-700 rounded w-24"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data || data.length === 0) {
+    return (
+      <div className="mb-4">
+        <div className="text-sm text-muted-foreground">
+          시장 데이터를 불러오는데 실패했습니다.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-4">
-      <div className="flex gap-3  pb-1.5">
-        {marketData.map((market) => (
+      <div className="flex gap-3 pb-1.5">
+        {data.map((market) => (
           <div
-            key={market.name}
-            className="min-w-[180px] cursor-pointer rounded-lg border border-border/50 bg-card p-3 text-card-foreground shadow-sm hover:bg-muted "
+            key={market.code}
+            className="min-w-[180px] cursor-pointer rounded-lg border border-border/50 bg-card p-3 text-card-foreground shadow-sm hover:bg-muted"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -44,20 +81,17 @@ export default function MarketOverview() {
                   {market.name}
                 </div>
                 <div className="mb-0.5 text-xl font-semibold tabular-nums">
-                  {market.value}
+                  {formatValue(market.value, market.code)}
                 </div>
                 <div
                   className={`flex items-center gap-1 text-sm font-medium ${
-                    market.isPositive ? 'text-red-500' : 'text-blue-500'
+                    market.isPositive ? "text-red-500" : "text-blue-500"
                   }`}
                 >
+                  <span>{formatChange(market.change, market.code)}</span>
                   <span>
-                    {market.isPositive ? '+' : ''}
-                    {market.change}
-                  </span>
-                  <span>
-                    ({market.isPositive ? '+' : ''}
-                    {market.changePercent})
+                    ({market.changePercent >= 0 ? "+" : ""}
+                    {market.changePercent.toFixed(2)}%)
                   </span>
                 </div>
               </div>
