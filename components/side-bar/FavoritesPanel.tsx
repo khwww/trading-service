@@ -6,7 +6,6 @@ import { useFavoriteStock } from '@/hooks/useFavoriteStock';
 import { useRealtimePrice } from '@/hooks/useRealtimePrice';
 import type { MarketType } from '@/lib/kis/KISRealtimePriceManager';
 import { Heart } from 'lucide-react';
-import ChangeRateCell from '../main/ChangeRateCell';
 
 export default function FavoritesPanel() {
   const [user, setUser] = useState<AuthUser>(null);
@@ -145,7 +144,15 @@ export default function FavoritesPanel() {
                     )}
                     {displayChangeRate != null && (
                       <div className="mt-1">
-                        <ChangeRateCell value={displayChangeRate} />
+                        <div
+                          className={`text-sm ${
+                            (displayChangeRate ?? 0) >= 0
+                              ? 'text-red-500'
+                              : 'text-blue-500'
+                          }`}
+                        >
+                          {displayChangeRate}%
+                        </div>
                       </div>
                     )}
                   </div>
