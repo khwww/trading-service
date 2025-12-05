@@ -28,6 +28,15 @@ function formatDate(dateStr: string) {
   return `${month}.${day}`;
 }
 
+// 오늘 날짜 문자열 (YYYYMMDD)
+function getTodayString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}${month}${day}`;
+}
+
 // 거래량 포맷 (만 단위)
 function formatVolume(volume: number) {
   if (volume >= 10000) {
@@ -192,9 +201,28 @@ export default function OrderBook({ stockCode, market }: OrderBookProps) {
             className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600"
             style={{ height: '356px' }}
           >
-            {dailyData?.map((item) => {
-              const isUp = item.changeSign === '1' || item.changeSign === '2';
-              const isDown = item.changeSign === '4' || item.changeSign === '5';
+            {dailyData?.map((item, index) => {
+              const todayStr = getTodayString();
+              const isToday = item.date === todayStr;
+
+              // 오늘 날짜이고 국내주식이면 실시간 데이터 사용
+              const displayClose = isToday && isDomestic && realtimeTick
+                ? realtimeTick.price
+                : item.close;
+              const displayChangeRate = isToday && isDomestic && realtimeTick
+                ? realtimeTick.changeRate
+                : item.changeRate;
+              const displayVolume = isToday && isDomestic && realtimeTick
+                ? realtimeTick.accumulatedVolume
+                : item.volume;
+
+              // 실시간 데이터가 있으면 실시간 기준으로 등락 판단
+              const isUp = isToday && isDomestic && realtimeTick
+                ? displayChangeRate > 0
+                : item.changeSign === '1' || item.changeSign === '2';
+              const isDown = isToday && isDomestic && realtimeTick
+                ? displayChangeRate < 0
+                : item.changeSign === '4' || item.changeSign === '5';
 
               const formatPrice = (price: number) => {
                 if (isDomestic) {
@@ -205,13 +233,15 @@ export default function OrderBook({ stockCode, market }: OrderBookProps) {
 
               return (
                 <div key={item.date} className="flex border-b border-gray-900 hover:bg-gray-900 py-2">
-                  <div className="flex-1 text-gray-400">{formatDate(item.date)}</div>
-                  <div className="flex-1 text-right">{formatPrice(item.close)}</div>
+                  <div className="flex-1 text-gray-400">
+                    {formatDate(item.date)}
+                  </div>
+                  <div className="flex-1 text-right">{formatPrice(displayClose)}</div>
                   <div className={`flex-1 text-right ${isUp ? 'text-red-500' : isDown ? 'text-blue-500' : 'text-gray-400'}`}>
-                    {isUp ? '+' : ''}{item.changeRate.toFixed(2)}%
+                    {isUp ? '+' : ''}{displayChangeRate.toFixed(2)}%
                   </div>
                   <div className="flex-1 text-right text-gray-400 pr-2">
-                    {formatVolume(item.volume)}
+                    {formatVolume(displayVolume)}
                   </div>
                 </div>
               );

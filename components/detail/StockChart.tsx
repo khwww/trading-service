@@ -14,7 +14,17 @@ import {
 } from "recharts";
 import { useStockDaily } from "@/hooks/useStockDaily";
 import { useOverseasStockDaily } from "@/hooks/useOverseasStockDaily";
+import { useStockPrice } from "@/hooks/useStockPrice";
 import { Grid3X3, TrendingUp, BarChart3 } from "lucide-react";
+
+// 오늘 날짜 문자열 (YYYYMMDD)
+function getTodayString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}${month}${day}`;
+}
 
 type MarketType = 'DOMESTIC' | 'OVERSEAS';
 
@@ -72,10 +82,12 @@ type ChartType = 'area' | 'line';
 export default function StockChart({ stockCode, market }: StockChartProps) {
   const isDomestic = market === 'DOMESTIC';
 
-  // 국내 주식 데이터
+  // 국내 주식 일별 데이터
   const domesticQuery = useStockDaily(isDomestic ? stockCode : '');
-  // 해외 주식 데이터
+  // 해외 주식 일별 데이터
   const overseasQuery = useOverseasStockDaily(isDomestic ? '' : stockCode);
+  // 국내 주식 현재가 (30초마다 갱신)
+  const { data: currentPrice } = useStockPrice(isDomestic ? stockCode : '');
 
   const { data, isLoading, error } = isDomestic ? domesticQuery : overseasQuery;
 
@@ -89,20 +101,30 @@ export default function StockChart({ stockCode, market }: StockChartProps) {
   const [chartType, setChartType] = useState<ChartType>('area');
 
   // 차트용 데이터 변환 (최근 30일, 날짜 오름차순 정렬)
+  // 오늘 날짜인 경우 30초마다 갱신되는 currentPrice 사용
   const CHART_DAYS = 30;
+  const todayStr = getTodayString();
   const chartData = data
     ? [...data]
         .slice(0, CHART_DAYS) // 최근 30일만 사용
         .reverse()
-        .map((item) => ({
-          time: formatDate(item.date),
-          price: item.close,
-          changeSign: item.changeSign,
-        }))
+        .map((item) => {
+          const isToday = item.date === todayStr;
+          // 국내 주식이고 오늘 날짜이면 실시간 가격 사용
+          const useRealtimePrice = isToday && isDomestic && currentPrice;
+          return {
+            time: formatDate(item.date),
+            price: useRealtimePrice ? currentPrice.price : item.close,
+            changeSign: useRealtimePrice ? currentPrice.changeSign : item.changeSign,
+          };
+        })
     : [];
 
-  // 등락 여부 (차트 색상용)
-  const isUp = data?.[0]?.changeSign === '1' || data?.[0]?.changeSign === '2';
+  // 등락 여부 (차트 색상용) - 오늘 날짜면 실시간 데이터 사용
+  const latestChangeSign = isDomestic && currentPrice
+    ? currentPrice.changeSign
+    : data?.[0]?.changeSign;
+  const isUp = latestChangeSign === '1' || latestChangeSign === '2';
 
   if (isLoading) {
     return (

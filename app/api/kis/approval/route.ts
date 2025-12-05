@@ -15,6 +15,7 @@ export async function POST() {
     }
 
     const url = `${BASE_URL}/oauth2/Approval`;
+    console.log('[KIS Approval] Requesting:', url);
 
     const res = await fetch(url, {
       method: 'POST',
@@ -40,7 +41,8 @@ export async function POST() {
     const data = await res.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('KIS approval route error:', error);
+    console.error('[KIS Approval] Route error:', error);
+    console.error('[KIS Approval] BASE_URL:', BASE_URL);
     return NextResponse.json(
       { message: 'Unexpected error', detail: String(error) },
       { status: 500 }

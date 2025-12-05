@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import type React from 'react';
-import { useEffect, useState } from 'react';
-import StockFilter from '@/components/main/StockFilter';
-import StockTable from '@/components/main/StockTable';
-import { useRealtimeStockChart } from '@/hooks/useRealtimeStockChart';
-import type { MarketType } from '@/lib/kis/KISRealtimePriceManager';
-import { useRealtimePrice } from '@/hooks/useRealtimePrice';
-import { useFavoriteStock } from '@/hooks/useFavoriteStock';
-import { fetchAuthUser, type AuthUser } from '@/services/fetchAuthUser';
+import type React from "react";
+import { useEffect, useState } from "react";
+import StockFilter from "@/components/main/StockFilter";
+import StockTable from "@/components/main/StockTable";
+import { useRealtimeStockChart } from "@/hooks/useRealtimeStockChart";
+import type { MarketType } from "@/lib/kis/KISRealtimePriceManager";
+import { useRealtimePrice } from "@/hooks/useRealtimePrice";
+import { useFavoriteStock } from "@/hooks/useFavoriteStock";
+import { fetchAuthUser, type AuthUser } from "@/services/fetchAuthUser";
 import type {
   DomesticRankingItem,
   OverseasRankingItem,
-} from '@/services/kisRankingClient';
+} from "@/services/kisRankingClient";
 
 type StockRankingItem = DomesticRankingItem | OverseasRankingItem;
 
 export default function StockRanking() {
-  const [region, setRegion] = useState<string>('전체');
-  const [metric, setMetric] = useState<string>('거래대금');
+  const [region, setRegion] = useState<string>("전체");
+  const [metric, setMetric] = useState<string>("거래대금");
   const [user, setUser] = useState<AuthUser>(null);
 
   useEffect(() => {
@@ -26,12 +26,12 @@ export default function StockRanking() {
 
     async function initAuth() {
       try {
-        const cached = localStorage.getItem('stockdodo:user');
+        const cached = localStorage.getItem("stockdodo:user");
         if (cached && !canceled) {
           setUser(JSON.parse(cached));
         }
       } catch (e) {
-        console.error('failed to parse cached user', e);
+        console.error("failed to parse cached user", e);
       }
 
       const me = await fetchAuthUser();
@@ -54,13 +54,13 @@ export default function StockRanking() {
     metric
   );
 
-  const isDomesticView = region === '국내' || region === '전체';
+  const isDomesticView = region === "국내" || region === "전체";
   const domesticSymbols = isDomesticView
     ? items
-        .filter((item) => item.market === 'DOMESTIC')
+        .filter((item) => item.market === "DOMESTIC")
         .map((item) => ({
           symbol: item.code,
-          market: 'DOMESTIC' as MarketType,
+          market: "DOMESTIC" as MarketType,
         }))
     : [];
 
@@ -99,7 +99,7 @@ export default function StockRanking() {
       price: tick.price,
       changeRate: tick.changeRate,
     };
-    console.log('[MERGED]', key, { base: item, tick, merged });
+    // console.log('[MERGED]', key, { base: item, tick, merged });
     return merged;
   });
 
@@ -111,7 +111,7 @@ export default function StockRanking() {
     e.stopPropagation();
 
     if (!userKey) {
-      alert('로그인이 필요한 서비스입니다.');
+      alert("로그인이 필요한 서비스입니다.");
       return;
     }
 
@@ -119,9 +119,9 @@ export default function StockRanking() {
       code: stock.code,
       name: stock.name,
       market: stock.market,
-      price: typeof stock.price === 'number' ? stock.price : undefined,
+      price: typeof stock.price === "number" ? stock.price : undefined,
       changeRate:
-        typeof stock.changeRate === 'number' ? stock.changeRate : undefined,
+        typeof stock.changeRate === "number" ? stock.changeRate : undefined,
     });
   };
 
