@@ -1,4 +1,4 @@
-# Stockdodo - 실시간 주식 정보 플랫폼
+# StockDoDo - 실시간 주식 정보 플랫폼
 
 국내/해외 주식의 실시간 시세와 차트를 제공하는 웹 애플리케이션입니다.
 
@@ -11,35 +11,34 @@
 - 국내·해외 주식의 실시간 시세와 시장 변동성을 직관적으로 학습
 - 거래대금/거래량/급상승/급하락 등 핵심 지표 중심의 종목 탐색 경험 제공
 - 실제 증권사 앱과 유사한 화면 구성으로 시장 구조와 정보 해석 능력 향상
-- 실시간 체결가(WebSocket), 호가/랭킹(REST API) 데이터 기반으로 진짜 시장처럼 움직이는 환경 제공
+- 실시간 체결가(WebSocket), 순위(REST API) 데이터 기반으로 진짜 시장처럼 움직이는 환경 제공
 
 ## 주요 기능
 
 ### 메인 페이지
 
 - **시장 지수/환율 현황**: 다우존스, 나스닥, S&P 500, 달러/원 환율 실시간 조회
-- **주식 랭킹**: 거래대금, 거래량, 등락률 기준 국내/해외 주식 랭킹
-- **실시간 가격 업데이트**: 국내 주식 WebSocket 연동 실시간 시세
+- **주식 랭킹**: 거래대금, 거래량, 등락률 기준 국내/해외 주식 랭킹 (30초마다 자동 갱신)
+- **실시간 가격 업데이트**: 국내 주식 현재가, 등락률 WebSocket 연동으로 실시간 시세 확인 가능
 
-<img src="https://github.com/user-attachments/assets/dde3d9c7-48cd-4e7a-aecf-b8557addada9" width="800" />
+<img src="https://github.com/user-attachments/assets/8aae1596-e8cd-4505-a727-c0884bd2ec7d" width="800" />
 
 
 ### 상세 페이지
 
 - **종목 헤더**: 종목명, 현재가, 등락률 등 종목 정보 표시 (국내: WebSocket 실시간 반영)
 - **주식 차트**: 일별 시세 차트 (30초마다 자동 갱신)
-- **일별 시세**: 날짜별 종가, 등락률, 거래량 조회 (국내: 당일 데이터 WebSocket 실시간 반영)+
+- **일별 시세**: 날짜별 종가, 등락률, 거래량 조회 (국내: 당일 데이터 WebSocket 실시간 반영)
 - **실시간 체결**: 국내 주식의 경우 WebSocket으로 실시간 체결 정보 확인 가능
 
 <img src="https://github.com/user-attachments/assets/96d493ef-09b6-4ccd-a5a3-be3a5c3e399c" width="800" />
 
-  
 
 ### 사이드바
 
 **관심 종목**: 로그인 시 하트 아이콘으로 관심 종목 등록/해제
 
-<img src="https://github.com/user-attachments/assets/8aae1596-e8cd-4505-a727-c0884bd2ec7d" width="700" />
+<img src="https://github.com/user-attachments/assets/dde3d9c7-48cd-4e7a-aecf-b8557addada9" width="700" />
 
 **최근 조회**: 최근 본 종목 목록 조회/해제
 
@@ -92,7 +91,7 @@
 
 ### 환경 변수 설정
 
-`.env` 파일을 생성하고 다음 변수를 설정하세요:
+`.env` 파일을 생성하고 다음 변수를 설정하세요
 
 ```
 # 한국투자증권 API
@@ -108,8 +107,7 @@ KAKAO_REST_API_KEY
 KAKAO_REDIRECT_URI
 ```
 
-> 참고: 한국투자증권 API 키는 한국투자증권 Open API에서 발급받을 수 있습니다.
-
+> 참고: 한국투자증권 API 키는 [한국투자증권](https://apiportal.koreainvestment.com/about-devcenter) Open API에서 발급받을 수 있습니다.
 ### 설치 및 실행
 
 ```bash
