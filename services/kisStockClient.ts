@@ -109,9 +109,6 @@ export async function fetchStockDaily(code: string): Promise<DailyPrice[]> {
 
   const data = (await res.json()) as DailyApiResponse;
 
-  // API 응답 확인용 로그
-  console.log("KIS Daily API 응답:", data);
-
   if (data.rt_cd !== "0") {
     throw new Error(`KIS API error: ${data.msg1}`);
   }

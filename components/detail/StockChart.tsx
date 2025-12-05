@@ -173,9 +173,9 @@ export default function StockChart({ stockCode, market }: StockChartProps) {
       </div>
 
       {/* 차트 */}
-      <div className="relative" style={{ height: "400px" }}>
+      <div className="relative" style={{ height: "400px", minHeight: "400px" }}>
         {isMounted && (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
             {chartType === 'area' ? (
               <AreaChart data={chartData}>
                 <defs>
