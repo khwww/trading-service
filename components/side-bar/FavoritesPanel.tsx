@@ -124,7 +124,7 @@ export default function FavoritesPanel() {
                 >
                   <button
                     type="button"
-                    className="flex h-7 w-7 items-center justify-center rounded-full"
+                    className="flex h-7 w-7 items-center justify-center rounded-full cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
                       removeFavorite?.(stock.code);
